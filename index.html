@@ -148,6 +148,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 :root[data-th=mono] .cell.today::after{background:linear-gradient(135deg,var(--ink) 50%,transparent 50%);opacity:1}
 :root[data-th=mono] #focus{border-bottom:1.5px solid var(--ink)}
 :root[data-th=mono] .fab button{box-shadow:none}
+.st{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}.st b{font-family:var(--fh);font-size:22px}.st small{grid-column:1/-1;color:var(--mute);font-size:12px}.st i{grid-column:1/-1;height:4px;margin-top:8px;background:var(--line);border-radius:2px;overflow:hidden}.st u{display:block;height:100%;background:var(--acc)}
 :root[data-th][data-fn=simple]{--f:"NanumSquareNeo","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--fh:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif;--item:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif}
 
 @media(min-width:800px){#main{overflow:visible}}
@@ -178,6 +179,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 <button class="tb" data-a="today">오늘</button>
 <button class="ib" data-a="next" aria-label="다음 주">›</button>
 <button class="gr" id="gsb" data-a="gcq" aria-label="Google 캘린더 새로고침" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+<button class="gr" data-a="stats" aria-label="통계"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></button>
 <button class="gr" data-a="settings" aria-label="환경설정"><svg width="20" height="20" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round" fill-rule="evenodd" d="M34.0 20.0 L32.6 9.0 L44.6 5.8 L48.8 16.0 L59.9 17.5 L66.7 8.7 L77.4 14.9 L73.2 25.1 L80.0 34.0 L91.0 32.6 L94.2 44.6 L84.0 48.8 L82.5 59.9 L91.3 66.7 L85.1 77.4 L74.9 73.2 L66.0 80.0 L67.4 91.0 L55.4 94.2 L51.2 84.0 L40.1 82.5 L33.3 91.3 L22.6 85.1 L26.8 74.9 L20.0 66.0 L9.0 67.4 L5.8 55.4 L16.0 51.2 L17.5 40.1 L8.7 33.3 L14.9 22.6 L25.1 26.8Z M35 50 a14.5 14.5 0 1 0 29.0 0 a14.5 14.5 0 1 0 -29.0 0Z"/></svg></button>
 
 </header>
@@ -245,6 +247,7 @@ function swap(id,dir){const i=find(id),l=day(i.date).filter(x=>!x.done),p=l.find
 function move(id,n){const i=find(id);if(i.gid)return gcChange(id,K(addD(P(i.date),n)),null);const nk=K(addD(P(i.date),n));mat(nk);i.date=nk;i.order=nx(nk);save();render();if(exK)expand(exK)}
 let exK=null;
 function close(){$("#ov").innerHTML="";exK=null}
+function statSheet(){const t=wk(new Date()),td=K(new Date()),w0=K(t),w1=K(addD(t,6)),m=td.slice(0,7),r=(l,f)=>{const a=S.items.filter(i=>i.date<=td&&f(i)),d=a.filter(i=>i.done).length,p=a.length?Math.round(d/a.length*100):0;return'<div class="st"><span>'+l+'</span><b>'+p+'%</b><small>'+d+' / '+a.length+'개 완료</small><i><u style="width:'+p+'%"></u></i></div>'};$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>통계<button data-a="close" class="ib">✕</button></h2>'+r("이번 주",i=>i.date>=w0&&i.date<=w1)+r("이번 달",i=>i.date.slice(0,7)===m)+r("전체",()=>true)+'<div class="mute" style="margin-top:10px">오늘까지의 할 일 기준 · Google 캘린더 일정 포함</div></div></div>'}
 function expand(k){exK=k;const d=P(k),l=day(k);
 $("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2><span>'+(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DN[d.getDay()]+')</span><button data-a="close" class="ib">✕</button></h2>'+
 (l.length?l.map(i=>'<div class="row'+(i.done?" done":"")+(i.gid?" gc":"")+'" data-id="'+i.id+'"><button class="ck'+(i.done?" on":"")+'" data-a="tg" data-id="'+i.id+'"></button><span class="t" data-a="rt" data-id="'+i.id+'">'+esc(i.text)+'</span><button class="pen" data-a="edit" data-id="'+i.id+'" aria-label="수정"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.5 4.5a2 2 0 012.8 0l.2.2a2 2 0 010 2.8L8 19z"/></svg></button>'+'<button data-a="mvp" data-id="'+i.id+'" title="하루 당기기">◀ 당기기</button><button data-a="mvn" data-id="'+i.id+'">미루기 ▶</button><button class="xb" data-a="del" data-id="'+i.id+'">✕</button></div>').join(""):'<p class="mute">일정이 없어요.</p>')+
@@ -290,7 +293,7 @@ if(x==="prev"){view=addD(view,-7);return render()}if(x==="next"){view=addD(view,
 if(x==="today"){selD=null;view=new Date();return render()}
 if(x==="go"){selD=a.dataset.d;view=P(a.dataset.d);return render()}
 if(x==="go2"){selD=a.dataset.d;view=P(a.dataset.d);close();return render()}
-if(x==="search")return searchSheet();if(x==="settings")return setSheet();if(x==="add")return addSheet(exK||K(view>new Date()&&wk(view)>wk(new Date())?wk(view):new Date()));
+if(x==="search")return searchSheet();if(x==="stats")return statSheet();if(x==="settings")return setSheet();if(x==="add")return addSheet(exK||K(view>new Date()&&wk(view)>wk(new Date())?wk(view):new Date()));
 if(x==="gcon"||x==="gcsync"||x==="gcq")return gcStart();if(x==="gcoff")return gcOffSheet();if(x==="gcoffdel")return gcOff(true);if(x==="gcoffkeep")return gcOff(false);if(x==="gcdelok")return gcDelOk(id);if(x==="gceditok")return gcEditOk(id);if(x==="addok")return addOk();if(x==="fs"){try{localStorage.setItem("wp_fs",a.dataset.v)}catch(e){}render();return setSheet()}if(x==="mail"){location.href="mailto:annakim.pj@gmail.com";return}if(x==="li"){const p=new firebase.auth.GoogleAuthProvider();fbAuth.signInWithPopup(p).then(setSheet).catch(()=>fbAuth.signInWithRedirect(p));return}if(x==="lo"){fbAuth.signOut().then(setSheet);return}if(x==="th"){S.theme=a.dataset.v;save();render();return setSheet()}if(x==="fn"){S.font=a.dataset.v;save();render();return setSheet()}
 if(x==="rdel"){S.rules=S.rules.filter(r=>r.id!==id);const t=K(new Date());S.items=S.items.filter(i=>!(i.rid===id&&!i.done&&i.date>=t));save();render();return setSheet()}
 if(x==="tg")return toggle(id);if(x==="edit")return editSheet(id);if(x==="rt")return itClick(id);if(x==="editok")return editOk(id,a.dataset.s);
