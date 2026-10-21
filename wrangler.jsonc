@@ -1,0 +1,8 @@
+{
+  "name": "weekly",
+  "compatibility_date": "2026-10-20",
+  "main": "worker.js",
+  "assets": { "directory": ".", "binding": "ASSETS" },
+  "vars": { "GCID": "1020505851741-obb3hcj51j3jhlr62h23u0i7r3hub1dd.apps.googleusercontent.com" },
+  "kv_namespaces": [{ "binding": "GK", "id": "db6e43c432234fdeb34202f48036f505" }]
+}
