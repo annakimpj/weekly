@@ -573,9 +573,9 @@ fetch("https://www.googleapis.com/calendar/v3/calendars/"+id+"/events?key="+FB_C
 (j.items||[]).forEach(e=>{if(!e.start||!e.start.date||!/^공휴일/.test(e.description||""))return;for(let x=P(e.start.date),z=P(e.end.date);x<z;x=addD(x,1))d.push(K(x))});
 const got=ys.filter(v=>d.some(k=>k.startsWith(v)));if(!got.length)return;HX=new Set(d);HY=new Set(got);try{localStorage.setItem("wp_hol",JSON.stringify({at:Date.now(),d,y:got}))}catch(e){}render()}).catch(()=>{})}
 holSync();
-// 설치 앱: 첫 실행은 아이폰 프로맥스 비율(300×650)로 화면 오른쪽 아래에 띄움(그 뒤로는 사용자가 바꾼 크기·위치를 창이 기억)
+// 설치 앱: 켤 때마다 창이 420px보다 넓으면 아이폰 프로맥스 비율(300×650)로 줄여 화면 오른쪽 아래에 둠. 직접 더 작게 줄인 크기는 그대로 둠(창 크기 복원 뒤에 실행되도록 조금 기다림)
 const isApp=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;
-if(isApp)try{if(!localStorage.getItem("wp_win2")){localStorage.setItem("wp_win2","1");const w=300,h=650;resizeTo(w,h);moveTo(screen.availLeft+screen.availWidth-w-16,screen.availTop+screen.availHeight-h-16)}}catch(e){}
+if(isApp)setTimeout(()=>{try{if(outerWidth>420){const w=300,h=650;resizeTo(w,h);moveBy(screen.availLeft+screen.availWidth-w-16-screenX,screen.availTop+screen.availHeight-h-16-screenY)}}catch(e){}},400);
 // 설치 앱 창이 380px보다 좁으면 폰 화면 배치를 통째로 축소(글자·칸이 창에 맞게 작아짐)
 function fitApp(){const z=isApp&&innerWidth<380?innerWidth/380:1;document.body.style.zoom=z<1?z:"";document.documentElement.style.setProperty("--zf",z)}
 fitApp();addEventListener("resize",fitApp);
