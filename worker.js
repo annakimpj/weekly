@@ -13,7 +13,8 @@ export default {
     if (u.pathname === '/gc/code') {
       if (!b.code) return new Response('bad request', { status: 400 });
       const j = await tok({ code: b.code, grant_type: 'authorization_code', redirect_uri: 'postmessage' });
-      if (!j.refresh_token) return Response.json({ error: j.error || 'no_refresh_token' }, { status: 400 });
+      // shortcut: diag는 invalid_client 원인 찾기용 임시값(비밀 자체는 안 보냄), 원인 찾으면 제거
+      if (!j.refresh_token) return Response.json({ error: j.error || 'no_refresh_token', diag: { id: String(env.GCID).slice(0, 14), sp: String(env.GCSECRET || '').slice(0, 7), sl: String(env.GCSECRET || '').length } }, { status: 400 });
       const key = crypto.randomUUID() + crypto.randomUUID();
       await env.GK.put(key, j.refresh_token);
       return Response.json({ key, access_token: j.access_token });
