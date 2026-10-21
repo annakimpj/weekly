@@ -259,7 +259,25 @@ $("#grid").innerHTML=h;const gb=$("#gsb");if(gb){gb.style.display=(fbAuth&&S.gca
 function find(id){return S.items.find(i=>i.id===id)}
 function toggle(id){const i=find(id);i.done=!i.done;i.at=Date.now();save();render();if(exK)expand(exK)}
 function swap(id,dir){const i=find(id),l=day(i.date).filter(x=>!x.done),p=l.findIndex(x=>x.id===id),q=p+dir;if(q<0||q>=l.length)return;const o=l[q].order;l[q].order=i.order;i.order=o;save();render();if(exK)expand(exK)}
-function move(id,n){const i=find(id);if(i.gid)return gcChange(id,K(addD(P(i.date),n)),null);const nk=K(addD(P(i.date),n));mat(nk);i.date=nk;i.order=nx(nk);save();render();if(exK)expand(exK)}
+function move(id,n){const i=find(id);relocate(id,K(addD(P(i.date),n)))}
+// 반복 일정 범위 팝업(삭제·이동 공용): 이 일정만 / 앞으로 / 모두. act는 고른 뒤 실행할 data-a, extra는 버튼에 붙일 속성
+function scopePop(title,act,id,verb,extra,note){const o=$("#scp");if(o)o.remove();$("#ov").insertAdjacentHTML("beforeend",'<div class="ov pop" id="scp" data-a="scx"><div class="sh"><h2>'+title+"</h2>"+[["one","이 일정만 "+verb],["fut","앞으로의 일정 "+verb],["all","모든 반복 일정 "+verb]].map(b=>'<button class="sb" data-a="'+act+'" data-s="'+b[0]+'" data-id="'+id+'"'+(extra||"")+' style="text-align:center">'+b[1]+"</button>").join("")+(note?'<p class="mute" style="margin:8px 4px 0;line-height:1.5">'+note+"</p>":"")+'<button class="sb" data-a="scx" style="text-align:center;color:var(--mute);border:0">취소</button></div></div>')}
+// 다른 날로 옮기기(드래그·당기기/미루기 공용). 반복 일정이면 범위를 물어봄(매일 반복은 옮겨도 규칙이 같아서 이 일정만)
+function relocate(id,k){const i=find(id);if(!i||i.date===k)return render();const r=!i.gid&&i.rid&&S.rules.find(x=>x.id===i.rid);
+if((i.gid&&i.g&&i.g.r&&gSibs(i).length<2)||(r&&r.t!=="d")){render();return scopePop("반복 일정 이동","mvsc",id,"이동",' data-k="'+k+'"')}moveTo(id,k,"one")}
+function moveTo(id,k,sc){const i=find(id);if(!i)return;if(i.gid)return sc==="one"?gcChange(id,k,null):gcMoveRec(i,k,sc);
+const r=i.rid&&S.rules.find(x=>x.id===i.rid);if(sc==="one"||!r){mat(k);i.date=k;i.order=nx(k);save();render();if(exK)expand(exK);return}
+// 앞으로: 기존 규칙은 이 날 전에서 끝내고 옮긴 날부터 새 규칙. 모두: 규칙 자체를 옮김. 매주는 이 요일만 새 요일로 바꿈
+const fd=P(i.date).getDay(),td=P(k).getDay(),all=sc==="all"||i.date<=r.start,from=all?"":i.date;let nr=r;
+if(!all){r.end=i.date;nr={id:uid(),text:r.text,t:r.t,days:r.days.slice(),start:k};S.rules.push(nr)}else if(r.t==="m"||r.t==="y")r.start=K(addD(P(r.start),dd(i.date,k)));
+if(nr.t==="w")nr.days=[...new Set(nr.days.map(d=>d===fd?td:d))];
+S.items=S.items.filter(x=>!(x.rid===r.id&&!x.done&&x.date>=from));S.items.forEach(x=>{if(x.rid===r.id&&x.date>=from)x.rid=nr.id});
+mat(k);Object.keys(S.mat).forEach(m=>{if(match(nr,m)&&!S.items.some(x=>x.rid===nr.id&&x.date===m))S.items.push({id:uid(),date:m,text:nr.text,done:false,order:nx(m),rid:nr.id})});
+save();render();if(exK)expand(exK)}
+// Weekly 반복 일정 삭제: 이 일정만 / 앞으로(규칙을 이 날 전에서 끝냄) / 모두(규칙과 회차 전부, 완료한 것 포함)
+function delRule(id,sc){const i=find(id),r=i&&S.rules.find(x=>x.id===i.rid);if(!i)return;
+if(sc==="one"||!r)S.items=S.items.filter(x=>x!==i);else if(sc==="fut"&&i.date>r.start){r.end=i.date;S.items=S.items.filter(x=>x!==i&&!(x.rid===r.id&&!x.done&&x.date>=i.date))}else{S.rules=S.rules.filter(x=>x!==r);S.items=S.items.filter(x=>x.rid!==r.id)}
+save();render();if(edG){edG=false;return close()}if(exK)return expand(exK);close()}
 let exK=null;
 function close(){$("#ov").innerHTML="";exK=null}
 function statSheet(){const t=wk(new Date()),td=K(new Date()),w0=K(t),w1=K(addD(t,6)),m=td.slice(0,7),r=(l,f)=>{const a=S.items.filter(i=>i.date<=td&&f(i)),d=a.filter(i=>i.done).length,p=a.length?Math.round(d/a.length*100):0;return'<div class="st"><span>'+l+'</span><b>'+p+'%</b><small>'+d+' / '+a.length+'개 완료</small><i><u style="width:'+p+'%"></u></i></div>'};$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>통계<button data-a="close" class="ib">✕</button></h2>'+r("이번 주",i=>i.date>=w0&&i.date<=w1)+r("이번 달",i=>i.date.slice(0,7)===m)+r("전체",()=>true)+'<div class="mute" style="margin-top:10px">오늘까지의 할 일 기준 · Google 캘린더 일정 포함</div></div></div>'}
@@ -314,7 +332,7 @@ if(x==="today"){selD=null;view=new Date();return render()}
 if(x==="go"){selD=a.dataset.d;view=P(a.dataset.d);return render()}
 if(x==="go2"){selD=a.dataset.d;view=P(a.dataset.d);close();return render()}
 if(x==="search")return searchSheet();if(x==="stats")return statSheet();if(x==="settings")return setSheet();if(x==="add")return addSheet(exK||K(view>new Date()&&wk(view)>wk(new Date())?wk(view):new Date()));
-if(x==="gcon"||x==="gcsync"||x==="gcq")return gcStart();if(x==="gcoff")return gcOffSheet();if(x==="gcoffdel")return gcOff(true);if(x==="gcoffkeep")return gcOff(false);if(x==="gcdelok")return gcDelOk(id);if(x==="gceditok")return gcEditOk(id,a.dataset.s);if(x==="addok")return addOk();if(x==="fs"){try{localStorage.setItem("wp_fs",a.dataset.v)}catch(e){}render();return setSheet()}if(x==="mail"){location.href="mailto:annakim.pj@gmail.com";return}if(x==="li"){const p=new firebase.auth.GoogleAuthProvider();fbAuth.signInWithPopup(p).then(setSheet).catch(()=>fbAuth.signInWithRedirect(p));return}if(x==="lo"){fbAuth.signOut().then(setSheet);return}if(x==="th"){S.theme=a.dataset.v;save();render();return setSheet()}if(x==="fn"){S.font=a.dataset.v;save();render();return setSheet()}
+if(x==="gcon"||x==="gcsync"||x==="gcq")return gcStart();if(x==="gcoff")return gcOffSheet();if(x==="gcoffdel")return gcOff(true);if(x==="gcoffkeep")return gcOff(false);if(x==="gcdelok")return gcDelOk(id,a.dataset.s);if(x==="delsc")return delRule(id,a.dataset.s);if(x==="mvsc"){$("#scp").remove();return moveTo(id,a.dataset.k,a.dataset.s)}if(x==="gceditok")return gcEditOk(id,a.dataset.s);if(x==="addok")return addOk();if(x==="fs"){try{localStorage.setItem("wp_fs",a.dataset.v)}catch(e){}render();return setSheet()}if(x==="mail"){location.href="mailto:annakim.pj@gmail.com";return}if(x==="li"){const p=new firebase.auth.GoogleAuthProvider();fbAuth.signInWithPopup(p).then(setSheet).catch(()=>fbAuth.signInWithRedirect(p));return}if(x==="lo"){fbAuth.signOut().then(setSheet);return}if(x==="th"){S.theme=a.dataset.v;save();render();return setSheet()}if(x==="fn"){S.font=a.dataset.v;save();render();return setSheet()}
 if(x==="rdel"){S.rules=S.rules.filter(r=>r.id!==id);const t=K(new Date());S.items=S.items.filter(i=>!(i.rid===id&&!i.done&&i.date>=t));save();render();return setSheet()}
 if(x==="tg")return toggle(id);if(x==="edit")return editSheet(id);if(x==="rt")return itClick(id);if(x==="editok")return editOk(id,a.dataset.s);
 // 반복 일정 저장: 수정 창 위에 범위 선택 팝업을 덧붙임(입력값 유지되도록 innerHTML 대신 insertAdjacentHTML)
@@ -323,7 +341,7 @@ if(x==="editsc"){if(!$("#et").value.trim())return;$("#ov").insertAdjacentHTML("b
 if(x==="gcsc"){if(!$("#et").value.trim())return;$("#ov").insertAdjacentHTML("beforeend",'<div class="ov pop" id="scp" data-a="scx"><div class="sh"><h2>반복 일정 수정</h2>'+[["one","이 일정만 변경"],["fut","앞으로의 일정 변경"],["all","이전 일정도 모두 변경"]].map(b=>'<button class="sb" data-a="gceditok" data-s="'+b[0]+'" data-id="'+id+'" style="text-align:center">'+b[1]+"</button>").join("")+'<p class="mute" style="margin:8px 4px 0;line-height:1.5">앞으로·전체 변경은 제목·시간·반복만 바뀌어요. 날짜는 "이 일정만 변경"에서 바꿀 수 있어요.</p><button class="sb" data-a="scx" style="text-align:center;color:var(--mute);border:0">취소</button></div></div>');return}
 if(x==="scx"){if(e.target===a)$("#scp").remove();return}if(x==="back"){if(edG){edG=false;return close()}return expand(exK)}if(x==="tour"){close();return tour(0)}if(x==="mp"||x==="mn"){const b=cm||addD(wk(view),3);cm=new Date(b.getFullYear(),b.getMonth()+(x==="mn"?1:-1),1);return render()}if(x==="up")return swap(id,-1);if(x==="dn")return swap(id,1);
 if(x==="mvp")return move(id,-1);if(x==="mvn")return move(id,1);
-if(x==="del"){const di=find(id);if(di&&di.gid)return gcDelAsk(id);S.items=S.items.filter(i=>i.id!==id);save();render();if(edG){edG=false;return close()}return expand(exK)}
+if(x==="del"){const di=find(id);if(di&&di.gid)return gcDelAsk(id);if(di&&di.rid&&S.rules.some(r=>r.id===di.rid))return scopePop("반복 일정 삭제","delsc",id,"삭제");S.items=S.items.filter(i=>i.id!==id);save();render();if(edG){edG=false;return close()}return expand(exK)}
 if(x==="endre"){reo=null;return render()}}
 const it=e.target.closest(".it");if(it&&e.target.closest(".t,i"))return itClick(it.dataset.id);
 const c=e.target.closest(".cell[data-k]");if(c&&!reo&&!e.target.closest("button"))expand(c.dataset.k);
@@ -335,7 +353,7 @@ function startDrag(x,y){const el=itEl;if(!el||dr)return;dr={id:el.dataset.id};lp
 function mvGhost(x,y){const mn=$("#main");if(y<120)mn.scrollTop-=10;else if(y>innerHeight-100)mn.scrollTop+=10;dr.gh.style.left=x+12+"px";dr.gh.style.top=y+12+"px";document.querySelectorAll(".dt,.rdt,.rdb").forEach(n=>n.classList.remove("dt","rdt","rdb"));const el=document.elementFromPoint(x,y),c=el&&el.closest(".cell[data-k]");if(!c)return;c.classList.add("dt");markGap(el.closest(".it,.row"),y,c.querySelectorAll(".it:not(.done):not(.dg)"))}
 // 끌고 있는 위치에 들어갈 자리를 점선으로 표시. 줄 위 절반=그 줄 앞, 아래 절반=뒤, 빈 곳·완료 줄=맨 끝
 function markGap(t,y,live){if(t&&t.classList.contains("dg"))return;if(t&&!t.classList.contains("done")){const b=t.getBoundingClientRect();t.classList.add(y<b.top+b.height/2?"rdt":"rdb")}else if(live.length)live[live.length-1].classList.add("rdb")}
-function drop(id,x,y){const i=find(id),el=document.elementFromPoint(x,y),c=el&&el.closest(".cell[data-k]");if(!i||!c)return render();const k=c.dataset.k,t=el.closest(".it");if(t&&t.dataset.id===id)return render();const ti=t&&find(t.dataset.id);if(i.gid&&i.date!==k){gcChange(id,k,null);return render()}mat(k);if(ti&&!ti.done){const b=t.getBoundingClientRect();i.order=y<b.top+b.height/2?ti.order-.5:ti.order+.5}else i.order=nx(k);i.date=k;day(k).filter(x=>!x.done).forEach((x,n)=>x.order=n+1);save();render()}
+function drop(id,x,y){const i=find(id),el=document.elementFromPoint(x,y),c=el&&el.closest(".cell[data-k]");if(!i||!c)return render();const k=c.dataset.k,t=el.closest(".it");if(t&&t.dataset.id===id)return render();const ti=t&&find(t.dataset.id);if(i.date!==k&&(i.gid||(i.rid&&S.rules.some(r=>r.id===i.rid))))return relocate(id,k);mat(k);if(ti&&!ti.done){const b=t.getBoundingClientRect();i.order=y<b.top+b.height/2?ti.order-.5:ti.order+.5}else i.order=nx(k);i.date=k;day(k).filter(x=>!x.done).forEach((x,n)=>x.order=n+1);save();render()}
 document.addEventListener("touchmove",e=>{if(dr||(od&&od.on))e.preventDefault()},{passive:false});
 const g=$("#grid");
 g.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&e.button!==0)return;sx=e.clientX;sy=e.clientY;pt=e.pointerType;itEl=e.target.closest(".it");dl=e.target.closest(".list");scl=null;dr=null;dn=true;const c=e.target.closest(".cell[data-k]");if(!c||e.target.closest("button"))return;if(itEl&&(pt!=="mouse"||dl.scrollHeight>dl.clientHeight))lt=setTimeout(()=>startDrag(e.clientX,e.clientY),350)/* 마우스도 스크롤되는 칸에서는 꾹 눌러야 옮기기(그냥 끌면 스크롤) */});
@@ -466,7 +484,7 @@ if(ex){Object.assign(body,ex);if(ex.recurrence&&body.start&&body.start.dateTime&
 const r2=await fetch(GCB+encodeURIComponent(eid)+"?sendUpdates=none",{method:"PATCH",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r2.ok){const e=new Error("http");e.status=r2.status;throw e}}
 /* 쓰기: Weekly에서 새 일정을 Google에 등록. 로컬에는 만들지 않고, 등록 후 다시 가져와서 연결된 일정으로 받음 */
 // Weekly 반복(t: d/w/m/y, ds: 요일 번호) → Google RRULE
-const rrOf=(t,ds)=>"RRULE:FREQ="+{d:"DAILY",w:"WEEKLY",m:"MONTHLY",y:"YEARLY"}[t]+(t==="w"?";BYDAY="+ds.map(d=>["SU","MO","TU","WE","TH","FR","SA"][d]).join(","):"");
+const GDOW=["SU","MO","TU","WE","TH","FR","SA"],rrOf=(t,ds)=>"RRULE:FREQ="+{d:"DAILY",w:"WEEKLY",m:"MONTHLY",y:"YEARLY"}[t]+(t==="w"?";BYDAY="+ds.map(d=>GDOW[d]).join(","):"");
 function gcAdd(ti,tm,k,ty,ds){// Google은 시작일을 무조건 첫 회차로 넣으므로, 매주 반복은 시작일을 고른 요일로 당김
 if(ty==="w")while(!ds.includes(P(k).getDay()))k=K(addD(P(k),1));const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,ev={summary:ti},f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00";
 if(tm){const s=P(k);s.setHours(+tm.slice(0,2),+tm.slice(3,5));ev.start={dateTime:f(s),timeZone:tz};ev.end={dateTime:f(new Date(s.getTime()+36e5)),timeZone:tz}}// shortcut: 끝 시간은 1시간 뒤로 고정, 필요하면 끝 시간 입력 추가
@@ -474,8 +492,8 @@ else{ev.start={date:k};ev.end={date:K(addD(P(k),1))}}
 if(ty!=="n")ev.recurrence=[rrOf(ty,ds)];
 toast("Google 캘린더에 등록하는 중…",0);
 gcGetTok().then(tk=>gcSerial(async()=>{const r=await fetch(GCB.slice(0,-1),{method:"POST",headers:{Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify(ev)});if(!r.ok){const e=new Error("http");e.status=r.status;throw e}return tk})).then(tk=>gcRun(tk,true)).then(()=>toast("Google 캘린더에도 등록했어요",2500)).catch(x=>gcErr(x,"등록하지"))}
-function gcDelAsk(id){const i=find(id),n=gSibs(i).length;$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>Google 캘린더에서도 삭제<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.7;margin:4px 0 12px"><b>'+esc(gTitle(i))+'</b> 일정이 Google 캘린더에서도 삭제돼요.'+(n>1?'<br>며칠에 걸친 일정이라 '+n+'일 모두 삭제돼요.':'')+(i.g&&i.g.r?'<br>반복 일정은 이 날짜 하나만 삭제돼요.':'')+'</p><button class="pb" data-a="gcdelok" data-id="'+id+'" style="background:var(--red)">삭제</button><button class="sb" data-a="close" style="text-align:center;color:var(--mute)">취소</button></div></div>'}
-function gcDelOk(id){const i=find(id);if(!i||!i.gid)return;const eid=gEid(i),tkP=gcGetTok();close();toast("삭제하는 중…",0);
+function gcDelAsk(id){const i=find(id),n=gSibs(i).length;if(i.g&&i.g.r&&n<2)return scopePop("반복 일정 삭제","gcdelok",id,"삭제","","Google 캘린더에서도 삭제돼요.");$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>Google 캘린더에서도 삭제<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.7;margin:4px 0 12px"><b>'+esc(gTitle(i))+'</b> 일정이 Google 캘린더에서도 삭제돼요.'+(n>1?'<br>며칠에 걸친 일정이라 '+n+'일 모두 삭제돼요.':'')+(i.g&&i.g.r?'<br>반복 일정은 이 날짜 하나만 삭제돼요.':'')+'</p><button class="pb" data-a="gcdelok" data-id="'+id+'" style="background:var(--red)">삭제</button><button class="sb" data-a="close" style="text-align:center;color:var(--mute)">취소</button></div></div>'}
+function gcDelOk(id,sc){const i=find(id);if(!i||!i.gid)return;if(sc==="fut"||sc==="all")return gcDelRec(i,sc);const eid=gEid(i),tkP=gcGetTok();close();toast("삭제하는 중…",0);
 tkP.then(tk=>gcSerial(()=>gcDeleteEvent(tk,eid))).then(()=>{S.items=S.items.filter(x=>!(x.gid&&gEid(x)===eid));save();render();toast("Google 캘린더에서도 삭제했어요",2500)}).catch(x=>gcErr(x,"삭제하지"))}
 function gcChange(id,nd,tt,tm,ex){const i=find(id);if(!i||!i.gid)return;const eid=gEid(i),sb=gSibs(i);
 if((nd&&nd!==i.date||tm!==undefined)&&sb.length>1){toast("며칠에 걸친 일정은 Google 캘린더에서 바꿔 주세요",3500);return}
@@ -501,20 +519,30 @@ const gMid=i=>(i.g&&i.g.m)||gEid(i).replace(/_[^_]*$/,"");// 반복 원본 ID: �
 // Google 반복 일정 전체 변경: 원본 일정의 제목·시간(·반복 규칙)을 바꾸고 다시 가져옴
 function gcAllChange(i,tt,tm,rec){const mid=gMid(i),tkP=gcGetTok();toast("Google 캘린더에 반영하는 중…",0);
 tkP.then(tk=>gcSerial(()=>gcPatchEvent(tk,mid,0,tt,tm,rec!==undefined?{recurrence:rec}:undefined)).then(()=>tk)).then(tk=>gcRun(tk,true)).then(()=>toast("반복 일정 전체에 반영했어요",2500)).catch(x=>gcErr(x,"반영하지"))}
-// Google 반복 일정 앞으로 변경: 원본 반복을 이 회차 바로 전에서 끝내고(UNTIL), 이 회차부터 새 반복 일정을 만듦(Google 앱과 같은 방식)
-function gcFutChange(i,tt,tm,rr,wds){const mid=gMid(i),inst=gEid(i).slice(mid.length+1),tkP=gcGetTok();if(!/^\d{8}/.test(inst))return gcAllChange(i,tt,tm,rr===undefined?undefined:rr?[rr]:[]);toast("Google 캘린더에 반영하는 중…",0);
-tkP.then(tk=>gcSerial(async()=>{const H={Authorization:"Bearer "+tk},J=async r=>{if(!r.ok){const e=new Error("http");e.status=r.status;throw e}return r.json()};
-const m=await J(await fetch(GCB+encodeURIComponent(mid)+"?fields="+encodeURIComponent("summary,start,end,recurrence"),{headers:H})),base=(m.recurrence||[]).find(x=>/^RRULE:/.test(x));if(!base){const e=new Error("http");e.status=400;throw e}
-const strip=s=>s.replace(/;(UNTIL|COUNT)=[^;]*/g,""),allDay=!!m.start.date,y=+inst.slice(0,4),mo=+inst.slice(4,6),dd=+inst.slice(6,8);
-// UNTIL: 종일이면 전날 날짜, 시간 일정이면 이 회차 시작 1초 전(UTC)
-const until=allDay?K(addD(new Date(y,mo-1,dd),-1)).replace(/-/g,""):new Date(Date.UTC(y,mo-1,dd,+inst.slice(9,11),+inst.slice(11,13),+inst.slice(13,15))-1e3).toISOString().replace(/[-:]|\.\d+/g,"");
-await J(await fetch(GCB+encodeURIComponent(mid)+"?sendUpdates=none",{method:"PATCH",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({recurrence:m.recurrence.map(x=>/^RRULE:/.test(x)?strip(x)+";UNTIL="+until:x)})}));
-const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00",ev={summary:tt!=null?tt:m.summary};let k=i.date;
+// Google 반복 공용: 응답 확인(gJ), UNTIL/COUNT 떼기(gStrip), 이 회차 바로 전까지로 끝내는 UNTIL 값(gUntil: 종일이면 전날, 시간 일정이면 시작 1초 전 UTC)
+const gJ=async r=>{if(!r.ok){const e=new Error("http");e.status=r.status;throw e}return r.json()},gStrip=s=>s.replace(/;(UNTIL|COUNT)=[^;]*/g,""),
+gUntil=(inst,allDay)=>{const y=+inst.slice(0,4),mo=+inst.slice(4,6),dd=+inst.slice(6,8);return allDay?K(addD(new Date(y,mo-1,dd),-1)).replace(/-/g,""):new Date(Date.UTC(y,mo-1,dd,+inst.slice(9,11),+inst.slice(11,13),+inst.slice(13,15))-1e3).toISOString().replace(/[-:]|\.\d+/g,"")},
+gInst=i=>gEid(i).slice(gMid(i).length+1),gMaster=(tk,mid)=>fetch(GCB+encodeURIComponent(mid)+"?fields="+encodeURIComponent("summary,start,end,recurrence"),{headers:{Authorization:"Bearer "+tk}}).then(gJ),
+gPatch=(tk,id,body)=>fetch(GCB+encodeURIComponent(id)+"?sendUpdates=none",{method:"PATCH",headers:{Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify(body)}).then(gJ);
+// Google 반복 일정 앞으로 변경: 원본 반복을 이 회차 바로 전에서 끝내고(UNTIL), nk(기본은 이 날)부터 새 반복 일정을 만듦(Google 앱과 같은 방식). rr: undefined=원래 규칙, null=반복 없음, 문자열=새 규칙, 함수=원래 규칙을 바꿔 씀
+function gcFutChange(i,tt,tm,rr,wds,nk){const mid=gMid(i),inst=gInst(i),tkP=gcGetTok();if(!/^\d{8}/.test(inst))return typeof rr==="function"?gcMoveRec(i,nk,"all"):gcAllChange(i,tt,tm,rr===undefined?undefined:rr?[rr]:[]);toast("Google 캘린더에 반영하는 중…",0);
+tkP.then(tk=>gcSerial(async()=>{const m=await gMaster(tk,mid),base=(m.recurrence||[]).find(x=>/^RRULE:/.test(x));if(!base){const e=new Error("http");e.status=400;throw e}
+const allDay=!!m.start.date;await gPatch(tk,mid,{recurrence:m.recurrence.map(x=>/^RRULE:/.test(x)?gStrip(x)+";UNTIL="+gUntil(inst,allDay):x)});
+const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00",ev={summary:tt!=null?tt:m.summary};let k=nk||i.date;
 if(rr&&wds)while(!wds.includes(P(k).getDay()))k=K(addD(P(k),1));// 새 매주 반복은 시작일을 고른 요일로(Google은 시작일을 무조건 첫 회차로 넣음)
 if(tm===""||(allDay&&tm===undefined)){const n=allDay?Math.max(1,Math.round((P(m.end.date)-P(m.start.date))/864e5)):1;ev.start={date:k};ev.end={date:K(addD(P(k),n))}}
 else{const ms=m.start.dateTime?new Date(m.start.dateTime):null,dur=ms&&m.end.dateTime?new Date(m.end.dateTime)-ms:36e5,s=P(k);if(tm)s.setHours(+tm.slice(0,2),+tm.slice(3,5));else s.setHours(ms.getHours(),ms.getMinutes());ev.start={dateTime:f(s),timeZone:tz};ev.end={dateTime:f(new Date(s.getTime()+dur)),timeZone:tz}}
-const nr=rr===undefined?strip(base):rr;if(nr)ev.recurrence=[nr];
-await J(await fetch(GCB.slice(0,-1),{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify(ev)}));return tk})).then(tk=>gcRun(tk,true)).then(()=>toast("이 날부터 반복 일정에 반영했어요",2500)).catch(x=>gcErr(x,"반영하지"))}
+const nr=rr===undefined?gStrip(base):typeof rr==="function"?rr(gStrip(base)):rr;if(nr)ev.recurrence=[nr];
+await fetch(GCB.slice(0,-1),{method:"POST",headers:{Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify(ev)}).then(gJ);return tk})).then(tk=>gcRun(tk,true)).then(()=>toast(nk?"이 날부터 반복 일정을 옮겼어요":"이 날부터 반복 일정에 반영했어요",2500)).catch(x=>gcErr(x,"반영하지"))}
+// Google 반복 일정 옮기기(앞으로/모두). 매주 반복은 이 요일만 새 요일로 바꿈(BYDAY), 모두는 원본 시작일도 같은 만큼 옮김
+function gcMoveRec(i,k,sc){const fd=GDOW[P(i.date).getDay()],td=GDOW[P(k).getDay()],swap=s=>s.replace(/BYDAY=([^;]*)/,(_,v)=>"BYDAY="+[...new Set(v.split(",").map(c=>c===fd?td:c))].join(","));
+if(sc==="fut")return gcFutChange(i,null,undefined,swap,null,k);
+const mid=gMid(i),n=dd(i.date,k),tkP=gcGetTok();toast("Google 캘린더에 반영하는 중…",0);
+tkP.then(tk=>gcSerial(async()=>{const m=await gMaster(tk,mid);await gPatch(tk,mid,{start:shO(m.start,n),end:shO(m.end,n),recurrence:(m.recurrence||[]).map(x=>/^RRULE:/.test(x)?swap(x):x)});return tk})).then(tk=>gcRun(tk,true)).then(()=>toast("반복 일정 전체를 옮겼어요",2500)).catch(x=>gcErr(x,"옮기지"))}
+// Google 반복 일정 삭제(앞으로/모두): 앞으로는 원본 반복을 이 회차 전에서 끝냄(첫 회차면 전부 삭제), 모두는 원본 삭제
+function gcDelRec(i,sc){const mid=gMid(i),inst=gInst(i),tkP=gcGetTok();close();toast("삭제하는 중…",0);
+tkP.then(tk=>gcSerial(async()=>{let all=sc==="all"||!/^\d{8}/.test(inst);if(!all){const m=await gMaster(tk,mid);if(i.date<=(m.start.date||m.start.dateTime).slice(0,10))all=true;else await gPatch(tk,mid,{recurrence:(m.recurrence||[]).map(x=>/^RRULE:/.test(x)?gStrip(x)+";UNTIL="+gUntil(inst,!!m.start.date):x)})}
+if(all)await gcDeleteEvent(tk,mid);return tk})).then(tk=>{S.items=S.items.filter(x=>!(x.gid&&x.g&&x.g.r&&gMid(x)===mid&&(sc==="all"||x.date>=i.date)));save();render();gcRun(tk,true);toast("Google 캘린더에서도 삭제했어요",2500)}).catch(x=>gcErr(x,"삭제하지"))}
 function gcOffSheet(){const n=S.items.filter(i=>i.gid).length;$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>Google 캘린더 연결 끊기<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.7;margin:4px 0 12px">Weekly에서 직접 적은 일정은 그대로 남아요.<br>연결된 일정 '+n+'개는 어떻게 할까요?<br><span class="mute">여기서 지우는 것은 이 앱에서만 지워지고, Google 캘린더의 일정은 그대로예요.</span></p><button class="pb" data-a="gcoffdel">연결된 일정도 지우기</button><button class="sb" data-a="gcoffkeep" style="text-align:center">연결된 일정은 남기기</button><button class="sb" data-a="close" style="text-align:center;color:var(--mute)">취소</button></div></div>'}
 function gcOff(del){const tk=gcTok();if(del)S.items=S.items.filter(i=>!i.gid);else S.items.forEach(i=>{if(i.gid){delete i.gid;delete i.gcal;delete i.g}});
 S.gcal=null;S.gdel=[];save();render();gcDrop();
