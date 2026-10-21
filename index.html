@@ -153,7 +153,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 @media(max-width:440px){header{gap:3px;padding-left:8px;padding-right:8px}header h1{min-width:0;white-space:nowrap}header .ib,header .gr{width:26px;height:26px}header .tb{height:26px;padding:0 8px}}
 .gc[style] .t::before{content:"";display:inline-block;width:.5em;height:.5em;margin-right:5px;border-radius:50%;background:var(--gc);vertical-align:.08em}
 [data-gs=bg] .it.gc[style] .t{padding:0 5px;margin-left:-2px;border-radius:4px;background:color-mix(in srgb,var(--gc) 16%,var(--card))}[data-gs=bg] .it.gc[style] .t::before{display:none}
-@media (display-mode:window-controls-overlay){header{padding-top:calc(env(titlebar-area-height,0px) + 4px);app-region:drag;-webkit-app-region:drag}header button{app-region:no-drag;-webkit-app-region:no-drag}}
+@media (display-mode:window-controls-overlay){header{padding-top:calc(env(titlebar-area-height,0px)/var(--zf,1) + 4px);app-region:drag;-webkit-app-region:drag}header button{app-region:no-drag;-webkit-app-region:no-drag}}
 :root[data-th][data-fn=simple]{--f:"NanumSquareNeo","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--fh:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif;--item:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif}
 
 @media(min-width:800px){#main{overflow:visible}}
@@ -573,8 +573,12 @@ fetch("https://www.googleapis.com/calendar/v3/calendars/"+id+"/events?key="+FB_C
 (j.items||[]).forEach(e=>{if(!e.start||!e.start.date||!/^공휴일/.test(e.description||""))return;for(let x=P(e.start.date),z=P(e.end.date);x<z;x=addD(x,1))d.push(K(x))});
 const got=ys.filter(v=>d.some(k=>k.startsWith(v)));if(!got.length)return;HX=new Set(d);HY=new Set(got);try{localStorage.setItem("wp_hol",JSON.stringify({at:Date.now(),d,y:got}))}catch(e){}render()}).catch(()=>{})}
 holSync();
-// 설치 앱 첫 실행: 폰보다 조금 큰 크기로 화면 오른쪽 아래에 띄움(그 뒤로는 사용자가 바꾼 크기·위치를 창이 기억)
-if(matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches)try{if(!localStorage.getItem("wp_win")){localStorage.setItem("wp_win","1");const w=380,h=680;resizeTo(w,h);moveTo(screen.availLeft+screen.availWidth-w-16,screen.availTop+screen.availHeight-h-16)}}catch(e){}
+// 설치 앱: 첫 실행은 아이폰 프로맥스 비율(300×650)로 화면 오른쪽 아래에 띄움(그 뒤로는 사용자가 바꾼 크기·위치를 창이 기억)
+const isApp=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;
+if(isApp)try{if(!localStorage.getItem("wp_win2")){localStorage.setItem("wp_win2","1");const w=300,h=650;resizeTo(w,h);moveTo(screen.availLeft+screen.availWidth-w-16,screen.availTop+screen.availHeight-h-16)}}catch(e){}
+// 설치 앱 창이 380px보다 좁으면 폰 화면 배치를 통째로 축소(글자·칸이 창에 맞게 작아짐)
+function fitApp(){const z=isApp&&innerWidth<380?innerWidth/380:1;document.body.style.zoom=z<1?z:"";document.documentElement.style.setProperty("--zf",z)}
+fitApp();addEventListener("resize",fitApp);
 /* 업데이트 소식: 여러 캘린더 가져오기 + PC 앱 설치. 모두에게 한 번만(띄우면 계정에 S.nw2 저장) */
 let nwShown=false;
 function nwSheet(){nwShown=true;S.nw2=1;save();const c=S.gcal,app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.75;margin:2px 0 10px"><b>여러 Google 캘린더 가져오기</b><br>업무·운동·생일처럼 따로 만든 캘린더도 가져올 수 있어요. 캘린더마다 색 점이나 배경색으로 구분해서 보여줘요.<br><span class="mute">환경설정 → Google 캘린더에서 고를 수 있어요.'+(c?' 이미 연결했다면 <b>권한 다시 허용하고 가져오기</b>를 한 번 눌러 주세요.':' 연결할 때 "Google에서 확인하지 않은 앱" 화면이 나오면 <b>고급 → Weekly(으)로 이동</b>을 눌러 주세요.')+'</span></p>'+(app?'':'<p style="font-size:14px;line-height:1.75;margin:0 0 12px"><b>PC에 앱으로 설치하기</b><br>· Edge: 오른쪽 위 ⋯ → 앱 → 이 사이트를 앱으로 설치<br>· Chrome: 주소창 오른쪽 설치 버튼(⊕)<br><span class="mute">바탕화면 아이콘으로 바로 열리고, 화면 오른쪽 아래에 작은 창으로 떠요.</span></p>')+'<button class="pb" data-a="nwgo">'+(c?"환경설정 열기":"Google 캘린더 연결하기")+'</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
