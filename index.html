@@ -330,7 +330,7 @@ if(x==="rpt"){document.querySelectorAll("#rpp .rpt .thb").forEach(b=>b.classList
 if(x==="rpok"){const on=$("#rpp .rpt .on");rp.t=on?on.dataset.v:"n";rp.days=rp.t==="w"?[...document.querySelectorAll("#rpd input:checked")].map(x=>+x.value):[];if(rp.t==="w"&&!rp.days.length)rp.days=[P(rpK).getDay()];$("#rpp").remove();const b=$(".rpb");if(b)b.outerHTML=rpBtn();return}
 if(x==="rpx"){if(e.target===a)$("#rpp").remove();return}
 if(x==="wst"){S.mon=a.dataset.v==="1"?1:0;cm=null;save();render();return setSheet()}
-if(x==="nwgo"||x==="nwno"){S.nw1=1;save();close();if(x==="nwgo")gcStart();return}
+if(x==="nwgo"){close();return S.gcal?setSheet():gcStart()}
 if(x==="clk"){const t=$("#"+a.dataset.t),on=!t.classList.contains("on");t.classList.toggle("on",on);a.classList.toggle("on",on);if(!on){t.value="";return}t.focus();try{t.showPicker()}catch(e){}return}
 if(x==="prev"){view=addD(view,-7);return render()}if(x==="next"){view=addD(view,7);return render()}
 if(x==="today"){selD=null;view=new Date();return render()}
@@ -575,10 +575,10 @@ const got=ys.filter(v=>d.some(k=>k.startsWith(v)));if(!got.length)return;HX=new 
 holSync();
 // 설치 앱 첫 실행: 폰보다 조금 큰 크기로 화면 오른쪽 아래에 띄움(그 뒤로는 사용자가 바꾼 크기·위치를 창이 기억)
 if(matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches)try{if(!localStorage.getItem("wp_win")){localStorage.setItem("wp_win","1");const w=380,h=680;resizeTo(w,h);moveTo(screen.availLeft+screen.availWidth-w-16,screen.availTop+screen.availHeight-h-16)}}catch(e){}
-/* 새 기능 안내: Google 캘린더 연동. 연결 안 한 사람에게 한 번씩, "다시 보지 않기"는 계정에 저장(S.nw1) */
+/* 업데이트 소식: 여러 캘린더 가져오기 + PC 앱 설치. 모두에게 한 번만(띄우면 계정에 S.nw2 저장) */
 let nwShown=false;
-function nwSheet(){nwShown=true;$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>새 기능 · Google 캘린더 연동<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.75;margin:2px 0 8px">이제 Google 캘린더 일정을 Weekly에서 함께 볼 수 있어요.<br>· 캘린더 일정을 이번 주 칸으로 가져오기<br>· Weekly에서 쓴 일정도 캘린더에 등록<br>· 여기서 고치거나 지우면 캘린더에도 반영</p><p class="mute" style="line-height:1.6;margin:0 0 12px">연결할 때 "Google에서 확인하지 않은 앱" 화면이 나오면 <b>고급 → Weekly(으)로 이동</b>을 눌러 주세요. 나중에 환경설정에서도 연결할 수 있어요.</p><button class="pb" data-a="nwgo">지금 연결하기</button><button class="sb" data-a="close" style="text-align:center">나중에</button><button class="sb" data-a="nwno" style="text-align:center;color:var(--mute);border:0">다시 보지 않기</button></div></div>'}
+function nwSheet(){nwShown=true;S.nw2=1;save();const c=S.gcal,app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.75;margin:2px 0 10px"><b>여러 Google 캘린더 가져오기</b><br>업무·운동·생일처럼 따로 만든 캘린더도 가져올 수 있어요. 캘린더마다 색 점이나 배경색으로 구분해서 보여줘요.<br><span class="mute">환경설정 → Google 캘린더에서 고를 수 있어요.'+(c?' 이미 연결했다면 <b>권한 다시 허용하고 가져오기</b>를 한 번 눌러 주세요.':' 연결할 때 "Google에서 확인하지 않은 앱" 화면이 나오면 <b>고급 → Weekly(으)로 이동</b>을 눌러 주세요.')+'</span></p>'+(app?'':'<p style="font-size:14px;line-height:1.75;margin:0 0 12px"><b>PC에 앱으로 설치하기</b><br>· Edge: 오른쪽 위 ⋯ → 앱 → 이 사이트를 앱으로 설치<br>· Chrome: 주소창 오른쪽 설치 버튼(⊕)<br><span class="mute">바탕화면 아이콘으로 바로 열리고, 화면 오른쪽 아래에 작은 창으로 떠요.</span></p>')+'<button class="pb" data-a="nwgo">'+(c?"환경설정 열기":"Google 캘린더 연결하기")+'</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
 // 로그인·튜토리얼·다른 창이 없고, 로그인했다면 계정 데이터까지 받은 뒤에 띄움
-const nwT=setInterval(()=>{if(nwShown||S.gcal||S.nw1)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
+const nwT=setInterval(()=>{if(nwShown||S.nw2)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
 render();
 </script></body></html>
