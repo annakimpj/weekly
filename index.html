@@ -177,6 +177,11 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 .sh input::-webkit-date-and-time-value{text-align:left}
 @supports(-webkit-touch-callout:none){.clk{right:8px}.clk.in{right:6px}}
 .tmi{display:none}.sh input.tmi:not(.on){display:none}
+.sg{margin-top:18px}.sg>h3{margin:0 0 7px 2px;font:600 11.5px/1 var(--f);letter-spacing:.14em;color:var(--mute)}
+.sgc{border:1px solid var(--line);border-radius:14px;padding:4px 14px 12px}.sgc .sb:first-child{margin-top:10px}
+.stl{font-size:13px;color:var(--mute);margin:12px 0 6px}.sgc .chips{margin:0}
+.lk{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 2px;border-bottom:1px solid var(--line);text-align:left;color:inherit;text-decoration:none;font-size:14.5px}.lk:last-child{border-bottom:0}.lk small{display:block;color:var(--mute);font-size:12px;margin-top:2px}.lk::after{content:"›";color:var(--mute);font-size:18px;margin-left:8px}
+.acct{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0 0}.acct .mute{line-height:1.5}.acct .sb{width:auto;margin:0;padding:8px 14px;flex:none}
 .opt{display:flex;justify-content:flex-end;align-items:center;gap:16px;margin-top:8px}
 .gci{display:flex;align-items:center;gap:5px;cursor:pointer}.gci input{width:15px;height:15px;margin:0;accent-color:var(--acc)}
 .gci .cal{width:17px;height:17px;background:var(--mute);-webkit-mask:var(--gci) center/contain no-repeat;mask:var(--gci) center/contain no-repeat}.gci input:checked+.cal{background:var(--acc)}
@@ -186,8 +191,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 </style></head><body>
 <header>
 <button class="ib" data-a="prev" aria-label="이전 주">‹</button>
-<h1 id="ttl"></h1>
-<button class="tb" data-a="today">오늘</button>
+<h1 id="ttl"></h1><button class="tb" data-a="today">오늘</button>
 <button class="ib" data-a="next" aria-label="다음 주">›</button>
 <button class="gr" id="gsb" data-a="gcq" aria-label="Google 캘린더 새로고침" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
 <button class="gr" data-a="stats" aria-label="통계"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></button>
@@ -315,9 +319,15 @@ function addOk(){const ti=$("#at").value.trim(),k=$("#ad").value;if(!ti||!k)retu
 addItem(ti,$("#atm").value,k,$("#rt").value,[...document.querySelectorAll("#wd input:checked")].map(x=>+x.value),$("#agc")&&$("#agc").checked);view=P(k);close();render()}
 function searchSheet(){$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>검색 · 이동<button data-a="close" class="ib">✕</button></h2><input type="text" id="sq" placeholder="일정 내용 검색" autocomplete="off"><div class="mute">또는 날짜로 이동</div><div style="display:flex;gap:6px;margin-bottom:8px"><input type="date" id="sd" value="'+K(view)+'" style="margin:0;flex:1;min-width:0"><button class="pb" data-a="sdgo" style="width:64px">이동</button></div><div id="sr"></div></div></div>';
 $("#sq").oninput=e=>{const q=e.target.value.trim().toLowerCase();$("#sr").innerHTML=q?(S.items.filter(i=>i.text.toLowerCase().includes(q)).sort((a,b)=>a.date<b.date?1:-1).slice(0,60).map(i=>'<div class="res" data-a="go2" data-d="'+i.date+'"><b>'+i.date+"</b> "+esc(i.text)+(i.done?" ✓":"")+"</div>").join("")||'<p class="mute">결과가 없어요.</p>'):""}}
-function setSheet(){$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>환경설정<button data-a="close" class="ib">✕</button></h2><div class="mute">'+esc(sync)+'</div>'+(fbAuth?(fbUser?'<button class="sb" data-a="lo">로그아웃</button>':'<button class="sb" data-a="li">Google로 로그인</button>'):"")+''+calSection()+'<button class="sb" data-a="tour">📖 사용 설명서 보기</button><button class="sb" data-a="mail">✉️ 개발자에게 연락하기<div class="mute">annakim.pj@gmail.com</div></button><a class="sb" href="privacy.html" target="_blank" rel="noopener" style="display:block;color:inherit;text-decoration:none">🔒 개인정보처리방침</a><h2 style="margin-top:14px;font-size:15px">테마</h2><div class="chips">'+[["classic","클래식"],["pastel","파스텔"],["mono","모노"]].map(a=>'<button class="thb'+((S.theme||"classic")===a[0]?" on":"")+'" data-a="th" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><h2 style="margin-top:14px;font-size:15px">서체</h2><div class="chips">'+[["base","기본"],["hand","손글씨"],["simple","심플"]].map(a=>'<button class="thb'+((S.font||"base")===a[0]?" on":"")+'" data-a="fn" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><h2 style="margin-top:14px;font-size:15px">글씨 크기</h2><div class="chips">'+[["s","작게"],["m","보통"],["l","크게"],["xl","아주 크게"]].map(a=>'<button class="thb'+((getFs()||"m")===a[0]?" on":"")+'" data-a="fs" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><h2 style="margin-top:14px;font-size:15px">한 주 시작</h2><div class="chips">'+[["0","일요일"],["1","월요일"]].map(a=>'<button class="thb'+(String(S.mon?1:0)===a[0]?" on":"")+'" data-a="wst" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><h2 style="margin-top:14px;font-size:15px">반복 일정</h2>'+
-(S.rules.length?S.rules.map(r=>'<div class="row"><span class="t">'+esc(r.text)+' <span class="mute">'+rl(r)+'</span></span><button data-a="rdel" data-id="'+r.id+'">삭제</button></div>').join(""):'<p class="mute">등록된 반복 일정이 없어요.</p>')+"</div></div>";
-}
+// 환경설정: 계정 / Google 캘린더 / 화면 / 반복 일정 / 앱·도움말 순서로 묶음
+function setSheet(){const sec=(t,b)=>'<div class="sg"><h3>'+t+'</h3><div class="sgc">'+b+"</div></div>",
+ch=(l,arr,cur,act)=>'<div class="stl">'+l+'</div><div class="chips">'+arr.map(a=>'<button class="thb'+(cur===a[0]?" on":"")+'" data-a="'+act+'" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+"</div>";
+$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>환경설정<button data-a="close" class="ib">✕</button></h2>'+
+sec("계정",'<div class="acct"><div class="mute">'+esc(sync)+"</div>"+(fbAuth?(fbUser?'<button class="sb" data-a="lo">로그아웃</button>':'<button class="sb" data-a="li">Google로 로그인</button>'):"")+"</div>")+
+(fbAuth?sec("GOOGLE 캘린더",calSection()):"")+
+sec("화면",ch("테마",[["classic","클래식"],["pastel","파스텔"],["mono","모노"]],S.theme||"classic","th")+ch("서체",[["base","기본"],["hand","손글씨"],["simple","심플"]],S.font||"base","fn")+ch("글씨 크기",[["s","작게"],["m","보통"],["l","크게"],["xl","아주 크게"]],getFs()||"m","fs")+ch("한 주 시작",[["0","일요일"],["1","월요일"]],String(S.mon?1:0),"wst"))+
+sec("반복 일정",S.rules.length?S.rules.map(r=>'<div class="row"><span class="t">'+esc(r.text)+' <span class="mute">'+rl(r)+'</span></span><button data-a="rdel" data-id="'+r.id+'">삭제</button></div>').join(""):'<p class="mute" style="margin-top:10px">등록된 반복 일정이 없어요.</p>')+
+sec("앱 · 도움말",(isApp?"":'<button class="lk" data-a="inst"><span>📲 앱으로 설치하기<small>PC·휴대폰 바탕화면에서 바로 열기</small></span></button>')+'<button class="lk" data-a="tour"><span>📖 사용 설명서 보기</span></button><button class="lk" data-a="mail"><span>✉️ 개발자에게 연락하기<small>annakim.pj@gmail.com</small></span></button><a class="lk" href="privacy.html" target="_blank" rel="noopener"><span>🔒 개인정보처리방침</span></a>')+"</div></div>"}
 function ics(tx){tx=tx.replace(/\r?\n[ \t]/g,"");let n=0;tx.split("BEGIN:VEVENT").slice(1).forEach(b=>{const sm=/^SUMMARY[^:]*:(.*)$/m.exec(b),ds=/^DTSTART[^:]*:(\d{8})(T\d{6}Z?)?/m.exec(b);if(!sm||!ds)return;let d=ds[1];if(ds[2]&&ds[2].endsWith("Z")){const m=/(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z/.exec(ds[0].split(":")[1]);if(m)d=K(new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6])))}else d=d.slice(0,4)+"-"+d.slice(4,6)+"-"+d.slice(6,8);
 const t=sm[1].replace(/\\,/g,",").replace(/\\n/g," ").replace(/\r/g,"").trim();if(!t||S.items.some(i=>i.date===d&&i.text===t))return;mat(d);S.items.push({id:uid(),date:d,text:t,done:false,order:nx(d)});n++});return n}
 document.addEventListener("click",e=>{if(lp){lp=false;return}const a=e.target.closest("[data-a]"),id=a&&a.dataset.id;
@@ -325,6 +335,7 @@ if(a){const x=a.dataset.a;
 if(x==="bg"){if(e.target===a)close();else{const rw=e.target.closest(".row[data-id]");if(rw&&Date.now()-lastOd>400)editSheet(rw.dataset.id)}return}
 if(x==="close")return close();
 if(x==="rp")return rpSheet();
+if(x==="inst")return instSheet();
 // 검색창 날짜 이동: 아이폰은 달력을 열자마자 change가 일어나서 버튼으로만 이동
 if(x==="sdgo"){const v=$("#sd").value;if(v){selD=v;view=P(v);close();render()}return}
 if(x==="rpt"){document.querySelectorAll("#rpp .rpt .thb").forEach(b=>b.classList.toggle("on",b===a));$("#rpd").style.display=a.dataset.v==="w"?"flex":"none";return}
@@ -432,8 +443,8 @@ function toast(m,ms){let d=$("#toast");if(!d){d=document.createElement("div");d.
 let gcChain=Promise.resolve();
 const gcSerial=f=>{const r=gcChain.then(f,f);gcChain=r.catch(()=>{});return r};
 function calSection(){if(!fbAuth)return"";const g=S.gcal,n=S.items.filter(i=>i.gid).length;
-if(!g)return'<h2 style="margin-top:14px;font-size:15px">Google 캘린더</h2><p class="mute" style="margin:2px 0 6px;line-height:1.6">Google 캘린더와 똑같이 맞춰요. 오늘 기준 지난 30일 ~ 앞으로 90일의 일정을 가져오고, 가져온 일정을 여기서 지우거나 제목·날짜를 바꾸면 Google 캘린더에도 반영돼요. 그래서 일정을 읽고 수정·삭제할 권한을 요청해요. Weekly에서 직접 쓴 일정은 캘린더로 보내지 않아요. 연결한 뒤 일정을 추가할 때 "Google 캘린더에도 등록"을 체크하면 캘린더에도 등록돼요.</p><button class="sb" data-a="gcon">Google 캘린더 연결하고 가져오기</button>';
-const d=new Date(g.at);return'<h2 style="margin-top:14px;font-size:15px">Google 캘린더</h2><div class="mute">연결됨 · 마지막 가져오기 '+(d.getMonth()+1)+"/"+d.getDate()+" "+p2(d.getHours())+":"+p2(d.getMinutes())+" · 연결된 일정 "+n+"개</div>"+(g.v>=3?gcCals():'<p class="mute" style="margin:6px 0 0;line-height:1.6;color:var(--red)">업무·운동 같은 다른 캘린더도 가져오려면 권한을 한 번 다시 허용해야 해요.</p>')+'<button class="sb" data-a="'+(g.v>=3?"gcsync":"gcre")+'">'+(g.v>=3?"지금 다시 가져오기":"권한 다시 허용하고 가져오기")+'</button><button class="sb" data-a="gcoff" style="color:var(--red)">연결 끊기</button><p class="mute" style="margin:6px 0 0;line-height:1.6">이름 뒤에 작은 달력 아이콘이 붙은 일정이 Google 캘린더와 연결된 일정이에요. 여기서 지우거나 제목·날짜를 바꾸면 Google 캘린더에도 반영돼요. 완료 체크는 이 앱에만 저장돼요.</p>'}
+if(!g)return'<p class="mute" style="margin:10px 0 6px;line-height:1.6">Google 캘린더 일정(지난 30일 ~ 앞으로 90일)을 Weekly에서 함께 보고, 여기서 고치거나 지우면 캘린더에도 반영돼요.</p><button class="sb" data-a="gcon">Google 캘린더 연결하고 가져오기</button>';
+const d=new Date(g.at);return'<div class="mute" style="margin-top:10px">연결됨 · 마지막 가져오기 '+(d.getMonth()+1)+"/"+d.getDate()+" "+p2(d.getHours())+":"+p2(d.getMinutes())+" · 연결된 일정 "+n+"개</div>"+(g.v>=3?gcCals():'<p class="mute" style="margin:6px 0 0;line-height:1.6;color:var(--red)">업무·운동 같은 다른 캘린더도 가져오려면 권한을 한 번 다시 허용해야 해요.</p>')+'<button class="sb" data-a="'+(g.v>=3?"gcsync":"gcre")+'">'+(g.v>=3?"지금 다시 가져오기":"권한 다시 허용하고 가져오기")+'</button><button class="sb" data-a="gcoff" style="color:var(--red)">연결 끊기</button><p class="mute" style="margin:6px 0 0;line-height:1.6">이름 뒤에 작은 달력 아이콘이 붙은 일정이 Google 캘린더와 연결된 일정이에요. 여기서 지우거나 제목·날짜를 바꾸면 Google 캘린더에도 반영돼요. 완료 체크는 이 앱에만 저장돼요.</p>'}
 function gcTok(){try{const o=JSON.parse(localStorage.getItem("wp_gtok2")||"null");if(o&&o.exp>Date.now())return o.t}catch(e){}return null}
 function gcStore(tk){try{localStorage.setItem("wp_gtok2",JSON.stringify({t:tk,exp:Date.now()+3300000}))}catch(e){}}
 function gcDrop(){try{localStorage.removeItem("wp_gtok2")}catch(e){}}
@@ -576,6 +587,14 @@ if(isApp)setTimeout(()=>{try{if(outerWidth>420){const w=300,h=650;resizeTo(w,h);
 // 설치 앱 창이 380px보다 좁으면 폰 화면 배치를 통째로 축소(글자·칸이 창에 맞게 작아짐)
 function fitApp(){const z=isApp&&innerWidth<380?innerWidth/380:1;document.body.style.zoom=z<1?z:"";document.documentElement.style.setProperty("--zf",z)}
 fitApp();addEventListener("resize",fitApp);
+/* 앱 설치(환경설정): Chrome·Edge·안드로이드는 설치창을 바로 띄우고(beforeinstallprompt), 안 되면 방법을 보여줌 */
+let insP=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();insP=e});addEventListener("appinstalled",()=>{insP=null;toast("설치했어요! 바탕화면·시작 메뉴에서 Weekly를 열어 보세요",4000)});
+function instSheet(){if(insP){const p=insP;insP=null;p.prompt();return}const u=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1),and=/Android/.test(u),edge=/Edg\//.test(u),
+row=(on,t,d)=>'<div style="padding:10px 12px;border-radius:12px;margin-bottom:6px;'+(on?"background:var(--accbg);":"border:1px solid var(--line);")+'"><b style="font-weight:600">'+t+'</b><div style="font-size:13.5px;line-height:1.6;margin-top:2px">'+d+"</div></div>";
+$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>앱으로 설치하기<button data-a="close" class="ib">✕</button></h2><p class="mute" style="line-height:1.6;margin:0 0 10px">설치하면 주소창 없이 앱처럼 열리고, 바탕화면·홈 화면 아이콘으로 바로 들어올 수 있어요. 무료이고 용량도 거의 차지하지 않아요.</p>'+
+row(ios,"아이폰·아이패드 (Safari)","아래 <b>공유 버튼(⬆)</b> → <b>홈 화면에 추가</b>")+row(and,"안드로이드 (Chrome)","오른쪽 위 <b>⋮</b> → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>")+
+row(!ios&&!and&&edge,"PC (Edge)","오른쪽 위 <b>⋯</b> → <b>앱</b> → <b>이 사이트를 앱으로 설치</b>")+row(!ios&&!and&&!edge,"PC (Chrome)","주소창 오른쪽 <b>설치 아이콘(⊕)</b> → <b>설치</b>")+'<button class="sb" data-a="close" style="text-align:center">닫기</button></div></div>'}
 /* 업데이트 소식: 여러 캘린더 가져오기 + PC 앱 설치. 모두에게 한 번만(띄우면 계정에 S.nw2 저장) */
 let nwShown=false;
 function nwSheet(){nwShown=true;S.nw2=1;save();const c=S.gcal,app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.75;margin:2px 0 10px"><b>여러 Google 캘린더 가져오기</b><br>업무·운동·생일처럼 따로 만든 캘린더도 가져올 수 있어요. 캘린더마다 색 점이나 배경색으로 구분해서 보여줘요.<br><span class="mute">환경설정 → Google 캘린더에서 고를 수 있어요.'+(c?' 이미 연결했다면 <b>권한 다시 허용하고 가져오기</b>를 한 번 눌러 주세요.':' 연결할 때 "Google에서 확인하지 않은 앱" 화면이 나오면 <b>고급 → Weekly(으)로 이동</b>을 눌러 주세요.')+'</span></p>'+(app?'':'<p style="font-size:14px;line-height:1.75;margin:0 0 12px"><b>PC에 앱으로 설치하기</b><br>· Edge: 오른쪽 위 ⋯ → 앱 → 이 사이트를 앱으로 설치<br>· Chrome: 주소창 오른쪽 설치 버튼(⊕)<br><span class="mute">바탕화면 아이콘으로 바로 열리고, 화면 오른쪽 아래에 작은 창으로 떠요.</span></p>')+'<button class="pb" data-a="nwgo">'+(c?"환경설정 열기":"Google 캘린더 연결하기")+'</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
