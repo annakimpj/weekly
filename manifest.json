@@ -1,0 +1,10 @@
+{
+  "name": "Weekly",
+  "short_name": "Weekly",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "background_color": "#f5f1ea",
+  "theme_color": "#f5f1ea",
+  "icons": [{ "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }]
+}
