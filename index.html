@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Weekly">
 <meta name="application-name" content="Weekly">
 <meta name="theme-color" content="#f5f1ea">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gaegu:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gamja+Flower&display=swap">
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--ink:#222;--mute:#8a8a85;--line:#e4e2da;--acc:#3b6df0;--accbg:#e8eefe;--today:#fff6dd;--red:#d9503f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#222226;--ink:#eee;--mute:#8e8e96;--line:#34343a;--acc:#7b9bff;--accbg:#27304f;--today:#3a3320;--red:#f07a6a;color-scheme:dark}}
@@ -78,7 +78,7 @@ header h1,.dh b,.ct,.sh h2{font-family:var(--fh)}
 .ill{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:8px;font-size:13px;margin-bottom:10px}
 .tbt{display:flex;justify-content:space-between;align-items:center}.tbt button{padding:7px 12px;border-radius:9px;font-size:13px;color:var(--mute)}.tbt span button+button{margin-left:4px}.tbt .tgo{background:var(--acc);color:#fff}
 header .ib[data-a=prev],header .ib[data-a=next]{display:none}@media(hover:hover) and (pointer:fine) and (max-width:799px){header .ib[data-a=prev],header .ib[data-a=next]{display:block}}
-:root[data-th][data-fn=hand]{--f:"Gaegu","Gowun Dodum","Apple SD Gothic Neo",cursive;--fh:"Gaegu","Gowun Dodum",cursive;--item:"Gaegu","Gowun Dodum",cursive}
+:root[data-th][data-fn=hand]{--f:"Gamja Flower","Gowun Dodum","Apple SD Gothic Neo",cursive;--fh:"Gamja Flower","Gowun Dodum",cursive;--item:"Gamja Flower","Gowun Dodum",cursive}
 [data-fn=hand] body{font-size:16px}[data-fn=hand] .it{font-size:15px}[data-fn=hand] .dh{font-size:14px}[data-fn=hand] .ct{font-size:14px}[data-fn=hand] .cg{font-size:12px}[data-fn=hand] header h1{font-size:19px}[data-fn=hand] .tbx p{font-size:14px}
 .it{cursor:grab}#grid{-webkit-touch-callout:none}.it.dg{opacity:.35}.cell.dt{outline:2px dashed var(--acc);outline-offset:-2px}
 .ghost{position:fixed;z-index:30;pointer-events:none;background:var(--card);border:1px solid var(--acc);border-radius:8px;padding:4px 9px;font-size:13px;box-shadow:0 4px 14px #0003;max-width:60vw;transform:rotate(-2deg)}
@@ -99,7 +99,7 @@ input,select,textarea{font-size:16px!important;font-family:inherit}
 html[data-fs=s]{--z:.9}html[data-fs=l]{--z:1.15}html[data-fs=xl]{--z:1.3}
 body{font-size:calc(14px*var(--z,1))}[data-fn=hand] body{font-size:calc(16px*var(--z,1))}
 .it{font-size:calc(12.5px*var(--z,1))}.dh{font-size:calc(12px*var(--z,1))}.ct{font-size:calc(12px*var(--z,1))}.cg{font-size:calc(10px*var(--z,1))}.tb{font-size:calc(12px*var(--z,1))}header h1{font-size:calc(16px*var(--z,1))}header h1 small{font-size:calc(11px*var(--z,1))}.row button{font-size:calc(12px*var(--z,1))}
-[data-fn=hand] .it{font-size:calc(15px*var(--z,1))}[data-fn=hand] .dh{font-size:calc(14px*var(--z,1))}[data-fn=hand] .ct{font-size:calc(14px*var(--z,1))}[data-fn=hand] .cg{font-size:calc(12px*var(--z,1))}[data-fn=hand] header h1{font-size:calc(19px*var(--z,1))}
+[data-fn=hand] .it{font-size:calc(15px*var(--z,1));line-height:1.15}[data-fn=hand] .dh{font-size:calc(14px*var(--z,1))}[data-fn=hand] .ct{font-size:calc(14px*var(--z,1))}[data-fn=hand] .cg{font-size:calc(12px*var(--z,1))}[data-fn=hand] header h1{font-size:calc(19px*var(--z,1))}
 @media(min-width:800px){:root{--w:clamp(480px,50vw,720px)}body{padding-left:calc((100vw - var(--w))/2);padding-right:calc((100vw - var(--w))/2)}.fab{right:calc((100vw - var(--w))/2 + 14px)}}
 #gw{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
 .ib.sdb{display:none;position:fixed;top:50%;width:44px;height:44px;font-size:20px;background:var(--card)}.sl{left:calc((100vw - var(--w))/4);transform:translate(-50%,-50%)}.sr{right:calc((100vw - var(--w))/4);transform:translate(50%,-50%)}
@@ -369,7 +369,7 @@ $("#sq").oninput=e=>{const q=e.target.value.trim().toLowerCase();$("#sr").innerH
 // 환경설정: 첫 화면은 항목마다 한 줄(현재 값만), 누르면 그 항목 화면(sp)으로 들어감
 let sp="";
 const TH=[["classic","클래식","따뜻한 종이 다이어리"],["pastel","파스텔","요일마다 다른 파스텔"],["mono","모노","흑백, 심플하고 깔끔하게"],["sea","시즌","계절마다 바뀌는 일러스트"]],
-FN=[["base","기본",'"Gowun Dodum",sans-serif'],["hand","손글씨",'"Gaegu","Gowun Dodum",cursive'],["simple","심플",'"NanumSquareNeo",sans-serif']],
+FN=[["base","기본",'"Gowun Dodum",sans-serif'],["hand","손글씨",'"Gamja Flower","Gowun Dodum",cursive'],["simple","심플",'"NanumSquareNeo",sans-serif']],
 FS=[["s","작게"],["m","보통"],["l","크게"],["xl","아주 크게"]],WS=[["0","일요일"],["1","월요일"]];
 function setSheet(){const sec=(t,b)=>'<div class="sg"><h3>'+t+'</h3><div class="sgc">'+b+"</div></div>",
 ch=(arr,cur,act)=>'<div class="chips">'+arr.map(a=>'<button class="thb'+(cur===a[0]?" on":"")+'" data-a="'+act+'" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+"</div>",
@@ -378,7 +378,7 @@ nm=(arr,k)=>(arr.find(a=>a[0]===k)||arr[0])[1],thK=SEA.includes(S.theme)?"sea":S
 top=t=>'<div class="ov" data-a="bg"><div class="sh">'+(t?'<button class="sbk" data-a="sp" data-v="">‹ 환경설정</button><h2>'+t:"<h2>환경설정")+'<button data-a="close" class="ib">✕</button></h2>';
 let b;
 if(sp==="gc")b=top("Google 캘린더")+calSection().replace(/^<h2[^>]*>Google 캘린더<\/h2>/,"");
-else if(sp==="th")b=top("테마")+'<div class="tgr">'+TH.map(t=>'<button class="tcd'+(thK===t[0]?" on":"")+'" data-a="th" data-v="'+t[0]+'"><span class="tim"><img src="themes/'+t[0]+'.jpg" alt="" loading="lazy"></span><b>"+t[1]+"</b><small>"+t[2]+"</small></button>").join("")+"</div>"+(SEA.includes(S.theme)?'<div class="ssub"><div class="chips">'+[["season","자동"],["spring","봄"],["summer","여름"],["autumn","가을"],["winter","겨울"]].map(a=>'<button class="thb'+(S.theme===a[0]?" on":"")+'" data-a="th" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><div class="mute">'+(S.theme==="season"?"달에 맞춰 바뀌어요 · 봄 3~5월 · 여름 6~8월 · 가을 9~11월 · 겨울 12~2월":"이 계절로 고정돼요")+"</div></div>":"");
+else if(sp==="th")b=top("테마")+'<div class="tgr">'+TH.map(t=>'<button class="tcd'+(thK===t[0]?" on":"")+'" data-a="th" data-v="'+t[0]+'"><span class="tim"><img src="themes/'+t[0]+'.jpg" alt="" loading="lazy"></span><b>'+t[1]+"</b><small>"+t[2]+"</small></button>").join("")+"</div>"+(SEA.includes(S.theme)?'<div class="ssub"><div class="chips">'+[["season","자동"],["spring","봄"],["summer","여름"],["autumn","가을"],["winter","겨울"]].map(a=>'<button class="thb'+(S.theme===a[0]?" on":"")+'" data-a="th" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><div class="mute">'+(S.theme==="season"?"달에 맞춰 바뀌어요 · 봄 3~5월 · 여름 6~8월 · 가을 9~11월 · 겨울 12~2월":"이 계절로 고정돼요")+"</div></div>":"");
 else if(sp==="fn")b=top("서체")+FN.map(f=>'<button class="fcd'+((S.font||"base")===f[0]?" on":"")+'" data-a="fn" data-v="'+f[0]+'"><b>'+f[1]+'</b><span style="font-family:'+esc(f[2])+'">가나다 Weekly 123</span></button>').join("");
 else if(sp==="fs")b=top("글씨 크기")+ch(FS,fs,"fs");
 else if(sp==="wst")b=top("한 주 시작")+ch(WS,ws,"wst");
