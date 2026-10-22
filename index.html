@@ -11,7 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="Weekly">
 <meta name="application-name" content="Weekly">
 <meta name="theme-color" content="#f5f1ea">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gamja+Flower&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gaegu:wght@400;700&family=Orbit&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.39.3/dist/galmuri.css">
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--ink:#222;--mute:#8a8a85;--line:#e4e2da;--acc:#3b6df0;--accbg:#e8eefe;--today:#fff6dd;--red:#d9503f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#222226;--ink:#eee;--mute:#8e8e96;--line:#34343a;--acc:#7b9bff;--accbg:#27304f;--today:#3a3320;--red:#f07a6a;color-scheme:dark}}
@@ -78,7 +79,7 @@ header h1,.dh b,.ct,.sh h2{font-family:var(--fh)}
 .ill{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:8px;font-size:13px;margin-bottom:10px}
 .tbt{display:flex;justify-content:space-between;align-items:center}.tbt button{padding:7px 12px;border-radius:9px;font-size:13px;color:var(--mute)}.tbt span button+button{margin-left:4px}.tbt .tgo{background:var(--acc);color:#fff}
 header .ib[data-a=prev],header .ib[data-a=next]{display:none}@media(hover:hover) and (pointer:fine) and (max-width:799px){header .ib[data-a=prev],header .ib[data-a=next]{display:block}}
-:root[data-th][data-fn=hand]{--f:"Gamja Flower","Gowun Dodum","Apple SD Gothic Neo",cursive;--fh:"Gamja Flower","Gowun Dodum",cursive;--item:"Gamja Flower","Gowun Dodum",cursive}
+:root[data-th][data-fn=hand]{--f:"Gaegu","Gowun Dodum","Apple SD Gothic Neo",cursive;--fh:"Gaegu","Gowun Dodum",cursive;--item:"Gaegu","Gowun Dodum",cursive}
 [data-fn=hand] body{font-size:16px}[data-fn=hand] .it{font-size:15px}[data-fn=hand] .dh{font-size:14px}[data-fn=hand] .ct{font-size:14px}[data-fn=hand] .cg{font-size:12px}[data-fn=hand] header h1{font-size:19px}[data-fn=hand] .tbx p{font-size:14px}
 .it{cursor:grab}#grid{-webkit-touch-callout:none}.it.dg{opacity:.35}.cell.dt{outline:2px dashed var(--acc);outline-offset:-2px}
 .ghost{position:fixed;z-index:30;pointer-events:none;background:var(--card);border:1px solid var(--acc);border-radius:8px;padding:4px 9px;font-size:13px;box-shadow:0 4px 14px #0003;max-width:60vw;transform:rotate(-2deg)}
@@ -99,7 +100,7 @@ input,select,textarea{font-size:16px!important;font-family:inherit}
 html[data-fs=s]{--z:.9}html[data-fs=l]{--z:1.15}html[data-fs=xl]{--z:1.3}
 body{font-size:calc(14px*var(--z,1))}[data-fn=hand] body{font-size:calc(16px*var(--z,1))}
 .it{font-size:calc(12.5px*var(--z,1))}.dh{font-size:calc(12px*var(--z,1))}.ct{font-size:calc(12px*var(--z,1))}.cg{font-size:calc(10px*var(--z,1))}.tb{font-size:calc(12px*var(--z,1))}header h1{font-size:calc(16px*var(--z,1))}header h1 small{font-size:calc(11px*var(--z,1))}.row button{font-size:calc(12px*var(--z,1))}
-[data-fn=hand] .it{font-size:calc(15px*var(--z,1));line-height:1.15}[data-fn=hand] .dh{font-size:calc(14px*var(--z,1))}[data-fn=hand] .ct{font-size:calc(14px*var(--z,1))}[data-fn=hand] .cg{font-size:calc(12px*var(--z,1))}[data-fn=hand] header h1{font-size:calc(19px*var(--z,1))}
+[data-fn=hand] .it{font-size:calc(15px*var(--z,1));line-height:calc(16.875px*var(--z,1))}[data-fn=hand] .dh{font-size:calc(14px*var(--z,1))}[data-fn=hand] .ct{font-size:calc(14px*var(--z,1))}[data-fn=hand] .cg{font-size:calc(12px*var(--z,1))}[data-fn=hand] header h1{font-size:calc(19px*var(--z,1))}
 @media(min-width:800px){:root{--w:clamp(480px,50vw,720px)}body{padding-left:calc((100vw - var(--w))/2);padding-right:calc((100vw - var(--w))/2)}.fab{right:calc((100vw - var(--w))/2 + 14px)}}
 #gw{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
 .ib.sdb{display:none;position:fixed;top:50%;width:44px;height:44px;font-size:20px;background:var(--card)}.sl{left:calc((100vw - var(--w))/4);transform:translate(-50%,-50%)}.sr{right:calc((100vw - var(--w))/4);transform:translate(50%,-50%)}
@@ -156,6 +157,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 [data-gs=bg] .it.gc[style] .t{padding:0 5px;margin-left:-2px;border-radius:4px;background:color-mix(in srgb,var(--gc) 16%,var(--card))}[data-gs=bg] .it.gc[style] .t::before{display:none}
 @media (display-mode:window-controls-overlay){header{padding-top:calc(env(titlebar-area-height,0px)/var(--zf,1) + 4px);app-region:drag;-webkit-app-region:drag}header button{app-region:no-drag;-webkit-app-region:no-drag}}
 :root[data-th][data-fn=simple]{--f:"NanumSquareNeo","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--fh:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif;--item:"NanumSquareNeo","Apple SD Gothic Neo",sans-serif}
+:root[data-th][data-fn=orbit]{--f:"Orbit","Apple SD Gothic Neo",monospace;--fh:"Orbit",monospace;--item:"Orbit",monospace}:root[data-th][data-fn=galmuri]{--f:"Galmuri11","Apple SD Gothic Neo",monospace;--fh:"Galmuri11",monospace;--item:"Galmuri11",monospace}
 
 @media(min-width:800px){#main{overflow:visible}}
 #toast{display:none;position:fixed;left:50%;top:calc(72px + env(safe-area-inset-top,0px));pointer-events:none;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:999px;font-size:calc(13px*var(--z,1));line-height:1.4;z-index:60;max-width:88vw;text-align:center;box-shadow:0 4px 16px #0003}
@@ -369,7 +371,7 @@ $("#sq").oninput=e=>{const q=e.target.value.trim().toLowerCase();$("#sr").innerH
 // 환경설정: 첫 화면은 항목마다 한 줄(현재 값만), 누르면 그 항목 화면(sp)으로 들어감
 let sp="";
 const TH=[["classic","클래식","따뜻한 종이 다이어리"],["pastel","파스텔","요일마다 다른 파스텔"],["mono","모노","흑백, 심플하고 깔끔하게"],["sea","시즌","계절마다 바뀌는 일러스트"]],
-FN=[["base","기본",'"Gowun Dodum",sans-serif'],["hand","손글씨",'"Gamja Flower","Gowun Dodum",cursive'],["simple","심플",'"NanumSquareNeo",sans-serif']],
+FN=[["base","고운돋움",'"Gowun Dodum",sans-serif'],["hand","개구",'"Gaegu","Gowun Dodum",cursive'],["simple","나눔스퀘어 네오",'"NanumSquareNeo",sans-serif'],["orbit","오르빗",'"Orbit",monospace'],["galmuri","갈무리11",'"Galmuri11",monospace']],
 FS=[["s","작게"],["m","보통"],["l","크게"],["xl","아주 크게"]],WS=[["0","일요일"],["1","월요일"]];
 function setSheet(){const sec=(t,b)=>'<div class="sg"><h3>'+t+'</h3><div class="sgc">'+b+"</div></div>",
 ch=(arr,cur,act)=>'<div class="chips">'+arr.map(a=>'<button class="thb'+(cur===a[0]?" on":"")+'" data-a="'+act+'" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+"</div>",
