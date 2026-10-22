@@ -151,6 +151,7 @@ header h1 small{font-family:var(--f);font-size:calc(8.5px*var(--z,1));font-weigh
 :root[data-th=mono] .cell.today::after{background:linear-gradient(135deg,var(--ink) 50%,transparent 50%);opacity:1}
 :root[data-th=mono] #focus{border-bottom:1.5px solid var(--ink)}
 :root[data-th=mono] .fab button{box-shadow:none}
+:root[data-th=neon]{--bg:#fff;--card:#fff;--ink:#0b0b0b;--mute:#8a8a8a;--line:#0b0b0b;--acc:#0b0b0b;--accbg:#efffc2;--today:#c6ff00;--red:#8c2f3c;--gl:transparent;--hsun:#8c2f3c;--hsat:#2e3f6e}:root[data-th=neon] .cell{border:1px solid var(--line);border-radius:0}:root[data-th=neon] .cell.today{box-shadow:inset 0 0 0 1px var(--ink)}:root[data-th=neon] .cell.today::after{background:linear-gradient(135deg,var(--ink) 50%,transparent 50%);opacity:1}:root[data-th=neon] #focus{border-bottom:2px solid var(--ink)}:root[data-th=neon] .ib,:root[data-th=neon] .tb,:root[data-th=neon] .it i,:root[data-th=neon] .row .ck,:root[data-th=neon] .thb,:root[data-th=neon] .sb,:root[data-th=neon] .sh,:root[data-th=neon] .fab button,:root[data-th=neon] .tcd,:root[data-th=neon] .tim{border-radius:0}:root[data-th=neon] .it.done i,:root[data-th=neon] .row .ck.on{background:#c6ff00;border-color:var(--ink)}:root[data-th=neon] .it.done i::after,:root[data-th=neon] .row .ck.on::after{border-color:#0b0b0b}:root[data-th=neon] .fab button{box-shadow:none}:root[data-th=neon] .fab .p{background:#c6ff00;color:#0b0b0b;border:1.5px solid #0b0b0b}
 .st{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}.st b{font-family:var(--fh);font-size:22px}.st small{grid-column:1/-1;color:var(--mute);font-size:12px}.st i{grid-column:1/-1;height:4px;margin-top:8px;background:var(--line);border-radius:2px;overflow:hidden}.st u{display:block;height:100%;background:var(--acc)}
 @media(max-width:440px){header{gap:3px;padding-left:8px;padding-right:8px}header h1{min-width:0;white-space:nowrap}header .ib,header .gr{width:26px;height:26px}header .tb{height:26px;padding:0 8px}}
 .gc[style] .t::before{content:"";display:inline-block;width:.5em;height:.5em;margin-right:5px;border-radius:50%;background:var(--gc);vertical-align:.08em}
@@ -370,7 +371,7 @@ $("#sq").oninput=e=>{const q=e.target.value.trim().toLowerCase();$("#sr").innerH
 // 환경설정: 계정 / Google 캘린더 / 화면 / 반복 일정 / 앱·도움말 순서로 묶음
 // 환경설정: 첫 화면은 항목마다 한 줄(현재 값만), 누르면 그 항목 화면(sp)으로 들어감
 let sp="";
-const TH=[["classic","클래식","따뜻한 종이 다이어리"],["pastel","파스텔","요일마다 다른 파스텔"],["mono","모노","흑백, 심플하고 깔끔하게"],["sea","시즌","계절마다 바뀌는 일러스트"]],
+const TH=[["classic","클래식","따뜻한 종이 다이어리"],["pastel","파스텔","요일마다 다른 파스텔"],["mono","모노","흑백, 심플하고 깔끔하게"],["neon","네온","하양에 형광 연두, 직선적"],["sea","시즌","계절마다 바뀌는 일러스트"]],
 FN=[["base","고운돋움",'"Gowun Dodum",sans-serif'],["hand","개구",'"Gaegu","Gowun Dodum",cursive'],["simple","나눔스퀘어 네오",'"NanumSquareNeo",sans-serif'],["orbit","오르빗",'"Orbit",monospace'],["galmuri","갈무리11",'"Galmuri11",monospace']],
 FS=[["s","작게"],["m","보통"],["l","크게"],["xl","아주 크게"]],WS=[["0","일요일"],["1","월요일"]];
 function setSheet(){const sec=(t,b)=>'<div class="sg"><h3>'+t+'</h3><div class="sgc">'+b+"</div></div>",
