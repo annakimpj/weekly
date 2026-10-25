@@ -279,7 +279,7 @@ const rpBtn=()=>'<button type="button" class="rpb'+(rp.t!=="n"?" on":"")+'" data
 const optRow=(id,gc,st)=>'<div class="opt"'+(st?' style="'+st+'"':"")+">"+(gc?'<label class="gci" title="Google 캘린더에도 등록"><input type="checkbox" id="'+id+'"><span class="cal"></span></label>':"")+rpBtn()+"</div>";
 function rpSheet(){const ds=rp.t==="w"?rp.days:[P(rpK).getDay()];$("#ov").insertAdjacentHTML("beforeend",'<div class="ov pop" id="rpp" data-a="rpx"><div class="sh"><h2>반복</h2><div class="chips rpt">'+[["n","안 함"],["d","매일"],["w","매주"],["m","매월"],["y","매년"]].map(a=>'<button class="thb'+(a[0]===rp.t?" on":"")+'" data-a="rpt" data-v="'+a[0]+'">'+a[1]+"</button>").join("")+'</div><div class="chips" id="rpd" style="display:'+(rp.t==="w"?"flex":"none")+'">'+ORD().map(n=>'<label><input type="checkbox" value="'+n+'"'+(ds.includes(n)?" checked":"")+'><span>'+DN[n]+"</span></label>").join("")+'</div><button class="pb" data-a="rpok">확인</button></div></div>')}
 // 새 일정 하나 만들기(+ 추가창·빠른 추가 공용): gc면 Google에만 등록, 반복이면 규칙과 열어 본 날짜의 회차까지
-function addItem(ti,tm,k,ty,ds,gc){if(ty==="w"&&!ds.length)ds=[P(k).getDay()];if(gc)return gcAdd(ti,tm,k,ty,ds);const t=(tm?tm+" ":"")+ti;
+function addItem(ti,tm,k,ty,ds,gc){if(ty==="w"&&!ds.length)ds=[P(k).getDay()];if(gc)return gcAdd(ti,tm,k,ty,ds,gcCal);const t=(tm?tm+" ":"")+ti;
 if(ty!=="n"){const r={id:uid(),text:t,t:ty,days:ds,start:k};S.rules.push(r);Object.keys(S.mat).forEach(m=>{if(m>=k&&match(r,m))S.items.push({id:uid(),date:m,text:t,done:false,order:nx(m),rid:r.id})});if(!S.mat[k])mat(k)}
 else{mat(k);S.items.push({id:uid(),date:k,text:t,done:false,order:nx(k)})}save()}
 // HX/HY: Google 공휴일 캘린더에서 받은 날짜와 그 연도(holSync). 받은 연도는 그걸, 아니면 위 HOL 표를 씀
@@ -316,9 +316,9 @@ function itHtml(i,k,ex){const m=ex?'<button class="mv" data-a="mvp" data-id="'+i
 function getFs(){try{return localStorage.getItem("wp_fs")}catch(e){return null}}
 function render(){if(S.theme==="lovely")S.theme="classic";document.documentElement.dataset.th=S.theme==="season"?seasonNow():S.theme||"classic";document.documentElement.dataset.gs=S.gcsty||"dot";document.querySelector("meta[name=theme-color]").content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();document.documentElement.dataset.fn=S.font||"base";document.documentElement.dataset.fs=getFs()||"m";const s=wk(view),e=addD(s,6),t=K(new Date()),hl=(selD&&K(wk(P(selD)))===K(s))?selD:t;const fi=$("#fi");if(fi&&(document.activeElement!==fi||fiWk!==K(s))){fi.value=(S.focus&&(S.focus[K(s)]||S.focus[K(addD(s,S.mon?-1:1))]))||"";fiWk=K(s)}
 $("#ttl").innerHTML=(s.getMonth()+1)+"월 "+s.getDate()+"일 – "+(e.getMonth()+1)+"월 "+e.getDate()+"일<small>WEEKLY PLANNER · "+s.getFullYear()+"</small>";
-if(K(s)!==lastWk){cm=null;lastWk=K(s)}const mid=cm||addD(s,3),first=new Date(mid.getFullYear(),mid.getMonth(),1),cs=wk(first);let cg=ORD().map(n=>'<div class="h">'+DE[n].slice(0,2)+"</div>").join("");
+if(K(s)!==lastWk){cm=null;lastWk=K(s)}const mid=cm||addD(s,3),first=new Date(mid.getFullYear(),mid.getMonth(),1),cs=addD(first,-first.getDay());let cg=DE.map(d=>'<div class="h">'+d.slice(0,2)+"</div>").join("");/* 먼슬리는 항상 일요일 시작 */
 const cnt=new Set(S.items.filter(i=>!i.done).map(i=>i.date));
-for(let r=0;r<6;r++){const rs=addD(cs,r*7);if(r>=5&&rs.getMonth()!==mid.getMonth())break;for(let c=0;c<7;c++){const d=addD(rs,c),k=K(d);cg+='<div data-a="go" data-d="'+k+'" class="'+(d.getMonth()!==mid.getMonth()?"o ":"")+(K(wk(d))===K(s)?"w ":"")+(k===hl?"td ":"")+(cnt.has(k)?"dot ":"")+(d.getDay()==0||isHol(k)?"sun":d.getDay()==6?"sat":"")+'"><b>'+d.getDate()+"</b></div>"}}
+for(let r=0;r<6;r++){const rs=addD(cs,r*7);if(r>=5&&rs.getMonth()!==mid.getMonth())break;for(let c=0;c<7;c++){const d=addD(rs,c),k=K(d);cg+='<div data-a="go" data-d="'+k+'" class="'+(d.getMonth()!==mid.getMonth()?"o ":"")+(k>=K(s)&&k<=K(e)?"w ":"")+(k===hl?"td ":"")+(cnt.has(k)?"dot ":"")+(d.getDay()==0||isHol(k)?"sun":d.getDay()==6?"sat":"")+'"><b>'+d.getDate()+"</b></div>"}}
 let h='<div class="cell cal"><div class="ct"><button class="mn" data-a="mp">‹</button>'+mid.getFullYear()+"."+String(mid.getMonth()+1).padStart(2,"0")+'.<button class="mn" data-a="mn">›</button></div><button class="sq" data-a="search" aria-label="검색"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button><div class="cg">'+cg+"</div></div>";
 for(let i=0;i<7;i++){const d=addD(s,i),k=K(d);h+='<div class="cell '+(k===hl?"today ":"")+(d.getDay()==0||isHol(k)?"sun ":d.getDay()==6?"sat ":"")+(reo===k?"re":"")+'" data-k="'+k+'"><div class="dh"><b>'+DE[d.getDay()]+"</b><span>"+(d.getMonth()!==s.getMonth()?(d.getMonth()+1)+"/":"")+d.getDate()+(reo===k?' · <button data-a="endre" style="color:var(--acc)">완료</button>':"")+'</span></div><div class="list">'+day(k).map(x=>itHtml(x,k,false)).join("")+"</div></div>"}
 $("#grid").innerHTML=h;const gb=$("#gsb");if(gb){gb.style.display=(fbAuth&&S.gcal)?"flex":"none";gb.classList.toggle("spin",gcBusy)}}
@@ -357,7 +357,7 @@ if(i.gid){rp={t:i.g&&i.g.r?"g":"n",days:[]};const multi=gSibs(i).length>1;$("#ov
 $("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>일정 수정<button data-a="back" class="ib">✕</button></h2><div class="dtw"><input type="text" id="et" value="'+esc(gTitle(i))+'" autocomplete="off"'+(r?' style="padding-right:34px">'+clk("etm",(tm?" on":"")+" in"):">")+'</div>'+(r?'':'<div class="dtw"><input type="date" id="ed" value="'+i.date+'">'+clk("etm",tm?" on":"")+'</div>')+'<input type="time" id="etm" class="tmi'+(tm?" on":"")+'" value="'+tm+'">'+optRow("egc",S.gcal&&!r,"margin:0 0 12px")+'<button class="pb" data-a="'+(r?"editsc":"editok")+'" data-id="'+id+'">저장</button>'+'<button class="sb" data-a="del" data-id="'+id+'" style="color:var(--red)">이 일정 삭제</button></div></div>'}
 function editOk(id,sc){const i=find(id),tm=$("#etm").value,t0=$("#et").value.trim(),t=t0&&(tm?tm+" ":"")+t0,ty=rp.t;if(!t)return;const de=$("#ed"),nd=de&&de.value?de.value:i.date;let ds=rp.days.slice();if(ty==="w"&&!ds.length)ds=[P(nd).getDay()];
 // Google에도 등록 체크: Weekly 일정을 Google 일정으로 옮김(반복 아닌 일정만 체크 칸이 보임)
-if($("#egc")&&$("#egc").checked){gcAdd(t0,tm,nd,ty,ds);S.items=S.items.filter(x=>x!==i);save();render();if(edG){edG=false;close()}else expand(exK);return}
+if($("#egc")&&$("#egc").checked){gcAdd(t0,tm,nd,ty,ds,gcCal);S.items=S.items.filter(x=>x!==i);save();render();if(edG){edG=false;close()}else expand(exK);return}
 let r=i.rid&&S.rules.find(x=>x.id===i.rid);
 // sc: one=이 일정만, fut=이 날부터(기존 규칙은 여기서 끝내고 새 규칙), all=처음부터 전부
 if(r&&sc==="one");
@@ -370,7 +370,7 @@ if(ty==="n")delete i.rid;else{r.text=t;r.t=ty;r.days=ds}}
 else{if(nd!==i.date){mat(nd);i.date=nd;i.order=nx(nd)}if(ty!=="n"){r={id:uid(),text:t,t:ty,days:ds,start:i.date};S.rules.push(r);i.rid=r.id}}
 i.text=t;if(sc!=="one"&&i.rid&&r)Object.keys(S.mat).forEach(m=>{if(match(r,m)&&!S.items.some(x=>x.rid===r.id&&x.date===m))S.items.push({id:uid(),date:m,text:t,done:false,order:nx(m),rid:r.id})});
 save();render();if(edG){edG=false;close()}else expand(i.date)}
-function addSheet(k){k=k||K(new Date());$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>일정 추가<button data-a="close" class="ib">✕</button></h2><input type="text" id="at" placeholder="무엇을 할까요?" autocomplete="off"><div class="dtw"><input type="date" id="ad" value="'+k+'">'+clk("atm")+'</div><input type="time" id="atm" class="tmi"><div class="mute">반복</div><select id="rt" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:inherit;font:inherit;margin-bottom:8px"><option value="n">반복 안 함</option><option value="d">매일</option><option value="w">매주</option><option value="m">매월</option><option value="y">매년</option></select><div class="chips" id="wd" style="display:none">'+ORD().map(i=>'<label><input type="checkbox" value="'+i+'"><span>'+DN[i]+"</span></label>").join("")+'</div>'+(S.gcal?'<label class="gck"><input type="checkbox" id="agc">Google 캘린더에도 등록</label>':'')+'<button class="pb" data-a="addok">추가</button></div></div>';$("#rt").onchange=e=>{$("#wd").style.display=e.target.value==="w"?"flex":"none"}}
+function addSheet(k){k=k||K(new Date());$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>일정 추가<button data-a="close" class="ib">✕</button></h2><input type="text" id="at" placeholder="무엇을 할까요?" autocomplete="off"><div class="dtw"><input type="date" id="ad" value="'+k+'">'+clk("atm")+'</div><input type="time" id="atm" class="tmi"><div class="mute">반복</div><select id="rt" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:inherit;font:inherit;margin-bottom:8px"><option value="n">반복 안 함</option><option value="d">매일</option><option value="w">매주</option><option value="m">매월</option><option value="y">매년</option></select><div class="chips" id="wd" style="display:none">'+ORD().map(i=>'<label><input type="checkbox" value="'+i+'"><span>'+DN[i]+"</span></label>").join("")+'</div>'+(S.gcal?'<label class="gck"><input type="checkbox" id="agc"><span class="gdot"></span>Google 캘린더에도 등록</label>':'')+'<button class="pb" data-a="addok">추가</button></div></div>';$("#rt").onchange=e=>{$("#wd").style.display=e.target.value==="w"?"flex":"none"}}
 function addOk(){const ti=$("#at").value.trim(),k=$("#ad").value;if(!ti||!k)return;
 addItem(ti,$("#atm").value,k,$("#rt").value,[...document.querySelectorAll("#wd input:checked")].map(x=>+x.value),$("#agc")&&$("#agc").checked);view=P(k);close();render()}
 function searchSheet(){$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>검색 · 이동<button data-a="close" class="ib">✕</button></h2><input type="text" id="sq" placeholder="일정 내용 검색" autocomplete="off"><div class="mute">또는 날짜로 이동</div><div style="display:flex;gap:6px;margin-bottom:8px"><input type="date" id="sd" value="'+K(view)+'" style="margin:0;flex:1;min-width:0"><button class="pb" data-a="sdgo" style="width:64px">이동</button></div><div id="sr"></div></div></div>';
@@ -406,6 +406,9 @@ if(a){const x=a.dataset.a;
 if(x==="bg"){if(e.target===a)close();else{const rw=e.target.closest(".row[data-id]");if(rw&&Date.now()-lastOd>400)editSheet(rw.dataset.id)}return}
 if(x==="close")return close();
 if(x==="rp")return rpSheet();
+// 캘린더 고르기 팝업: 고르면 기억하고(다음에 '최근' 표시), 가져오기 목록에도 넣어서 등록한 일정이 다시 보이게
+if(x==="gcpick"){const c=gcW().find(v=>v.id===a.dataset.v);gcCal=c.id;S.gclast=c.id;if(!c.p&&!(S.gcsel||[]).includes(c.id))S.gcsel=(S.gcsel||[]).concat(c.id);save();gcMark($("#"+gcpT),c);$("#gcp").remove();return}
+if(x==="gcpx"){if(e.target!==a)return;const t=$("#"+gcpT);if(t){t.checked=false;gcMark(t,null)}$("#gcp").remove();return}
 if(x==="inst")return instSheet();
 // 검색창 날짜 이동: 아이폰은 달력을 열자마자 change가 일어나서 버튼으로만 이동
 if(x==="sdgo"){const v=$("#sd").value;if(v){selD=v;view=P(v);close();render()}return}
@@ -413,10 +416,10 @@ if(x==="rpt"){document.querySelectorAll("#rpp .rpt .thb").forEach(b=>b.classList
 if(x==="rpok"){const on=$("#rpp .rpt .on");rp.t=on?on.dataset.v:"n";rp.days=rp.t==="w"?[...document.querySelectorAll("#rpd input:checked")].map(x=>+x.value):[];if(rp.t==="w"&&!rp.days.length)rp.days=[P(rpK).getDay()];$("#rpp").remove();const b=$(".rpb");if(b)b.outerHTML=rpBtn();return}
 if(x==="rpx"){if(e.target===a)$("#rpp").remove();return}
 if(x==="wst"){S.mon=a.dataset.v==="1"?1:0;cm=null;save();render();return setSheet()}
-if(x==="nwgo"){close();return S.gcal?setSheet():gcStart()}
+if(x==="nwgo"){close();return setSheet()}
 if(x==="clk"){const t=$("#"+a.dataset.t),on=!t.classList.contains("on");t.classList.toggle("on",on);a.classList.toggle("on",on);if(!on){t.value="";return}t.focus();try{t.showPicker()}catch(e){}return}
 if(x==="prev"){view=addD(view,-7);return render()}if(x==="next"){view=addD(view,7);return render()}
-if(x==="today"){selD=null;view=new Date();return render()}
+if(x==="today"){selD=null;cm=null;view=new Date();return render()}
 if(x==="go"){selD=a.dataset.d;view=P(a.dataset.d);return render()}
 if(x==="go2"){selD=a.dataset.d;view=P(a.dataset.d);close();return render()}
 if(x==="search")return searchSheet();if(x==="stats")return statSheet();if(x==="settings")return setSheet();if(x==="add")return addSheet(exK||K(view>new Date()&&wk(view)>wk(new Date())?wk(view):new Date()));
@@ -539,7 +542,7 @@ const j=await res.json();(j.items||[]).forEach(v=>{if(c)v._c=c;out.push(v)});pt=
 return{events:out,minK:K(a),maxK:K(addD(b,-1)),v}}
 function gcEntries(evs){const out=[],seen={};
 evs.forEach(ev=>{if(!ev||ev.status==="cancelled"||!ev.start)return;if(ev.attendees&&ev.attendees.some(a=>a.self&&a.responseStatus==="declined"))return;
-const ti=(ev.summary||"(제목 없음)").replace(/\s+/g," ").trim(),rc=ev.recurringEventId?1:0;
+const nt=(S.gnote||{})[ev.recurringEventId||ev.id],ti=(ev.summary||"(제목 없음)").replace(/\s+/g," ").trim()+(nt?"; "+nt:""),rc=ev.recurringEventId?1:0;
 if(ev.start.date){let d=P(ev.start.date);const end=ev.end&&ev.end.date?P(ev.end.date):addD(d,1),nd=Math.max(1,Math.round((end-d)/864e5));for(let n=0;d<end&&n<14;n++,d=addD(d,1)){const k=K(d),gid=ev.id+"@"+k;if(!seen[gid]){seen[gid]=1;out.push({gid,date:k,text:ti,order:-2,g:{p:"",a:1,n:nd,r:rc,m:ev.recurringEventId||"",c:ev._c}})}}}
 else if(ev.start.dateTime){const d=new Date(ev.start.dateTime);if(isNaN(d))return;const k=K(d),gid=ev.id+"@"+k;if(seen[gid])return;seen[gid]=1;const pre=p2(d.getHours())+":"+p2(d.getMinutes())+" ";out.push({gid,date:k,text:pre+ti,order:-1+(d.getHours()*60+d.getMinutes())/10000,g:{p:pre,a:0,n:1,r:rc,m:ev.recurringEventId||"",c:ev._c}})}});
 return out.slice(0,800)}
@@ -581,13 +584,23 @@ const r2=await fetch(gB(c)+encodeURIComponent(eid)+"?sendUpdates=none",{method:"
 /* 쓰기: Weekly에서 새 일정을 Google에 등록. 로컬에는 만들지 않고, 등록 후 다시 가져와서 연결된 일정으로 받음 */
 // Weekly 반복(t: d/w/m/y, ds: 요일 번호) → Google RRULE
 const GDOW=["SU","MO","TU","WE","TH","FR","SA"],rrOf=(t,ds)=>"RRULE:FREQ="+{d:"DAILY",w:"WEEKLY",m:"MONTHLY",y:"YEARLY"}[t]+(t==="w"?";BYDAY="+ds.map(d=>GDOW[d]).join(","):"");
-function gcAdd(ti,tm,k,ty,ds){// Google은 시작일을 무조건 첫 회차로 넣으므로, 매주 반복은 시작일을 고른 요일로 당김
-if(ty==="w")while(!ds.includes(P(k).getDay()))k=K(addD(P(k),1));const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,ev={summary:ti},f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00";
+// Google에도 등록할 캘린더 고르기: 체크하면 팝업이 뜨고, 고른 캘린더 색 원으로 체크 옆 아이콘을 바꿈(gcCal에 기억)
+let gcCal=null,gcpT=null;
+// 제목에 ; 가 있으면 앞부분만 Google 캘린더 제목으로, 뒷부분은 Weekly에만 남는 메모(S.gnote[일정 id])
+const gSplit=t=>{const m=/\s*[;；]\s*/.exec(t||"");return m?[t.slice(0,m.index).trim(),t.slice(m.index+m[0].length).trim()]:[t,""]},gSum=t=>t==null?t:gSplit(t)[0];
+const gcEvUrl=cal=>"https://www.googleapis.com/calendar/v3/calendars/"+encodeURIComponent(cal||"primary")+"/events",
+gcW=()=>(S.gclist||[]).filter(c=>!c.ro),gcCalName=id=>((S.gclist||[]).find(c=>c.id===id)||{}).n||"";
+function gcMark(inp,c){if(!inp)return;const s=inp.parentNode.querySelector(".cal,.gdot");if(s)s.style.cssText=c?"background:"+c.c+";-webkit-mask:none;mask:none;border-radius:50%;width:12px;height:12px;display:inline-block;flex:none":"";inp.parentNode.title=c?"Google 캘린더: "+c.n:"Google 캘린더에도 등록"}
+document.addEventListener("change",e=>{const t=e.target;if(!t.matches||!t.matches("#agc,#qgc,#egc"))return;if(!t.checked)return gcMark(t,null);
+const l=gcW();if(l.length<2){gcCal=l[0]?l[0].id:"primary";return gcMark(t,l[0]||null)}gcpT=t.id;
+$("#ov").insertAdjacentHTML("beforeend",'<div class="ov pop" id="gcp" data-a="gcpx"><div class="sh"><h2>어느 캘린더에 넣을까요?</h2>'+l.map(c=>'<button class="sb" data-a="gcpick" data-v="'+esc(c.id)+'" style="display:flex;align-items:center;gap:10px"><span style="width:14px;height:14px;border-radius:50%;background:'+esc(c.c)+';flex:none"></span>'+esc(c.n)+(c.id===S.gclast?'<span class="mute">· 최근</span>':"")+"</button>").join("")+'<button class="sb" data-a="gcpx" style="text-align:center;color:var(--mute);border:0">취소</button></div></div>')});
+function gcAdd(ti,tm,k,ty,ds,cal){// Google은 시작일을 무조건 첫 회차로 넣으므로, 매주 반복은 시작일을 고른 요일로 당김
+if(ty==="w")while(!ds.includes(P(k).getDay()))k=K(addD(P(k),1));const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,[sum,note]=gSplit(ti),ev={summary:sum},f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00";
 if(tm){const s=P(k);s.setHours(+tm.slice(0,2),+tm.slice(3,5));ev.start={dateTime:f(s),timeZone:tz};ev.end={dateTime:f(new Date(s.getTime()+36e5)),timeZone:tz}}// shortcut: 끝 시간은 1시간 뒤로 고정, 필요하면 끝 시간 입력 추가
 else{ev.start={date:k};ev.end={date:K(addD(P(k),1))}}
 if(ty!=="n")ev.recurrence=[rrOf(ty,ds)];
 toast("Google 캘린더에 등록하는 중…",0);
-gcGetTok().then(tk=>gcSerial(async()=>{const r=await fetch(GCB.slice(0,-1),{method:"POST",headers:{Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify(ev)});if(!r.ok){const e=new Error("http");e.status=r.status;throw e}return tk})).then(tk=>gcRun(tk,true)).then(()=>toast("Google 캘린더에도 등록했어요",2500)).catch(x=>gcErr(x,"등록하지"))}
+gcGetTok().then(tk=>gcSerial(async()=>{const r=await fetch(gcEvUrl(cal),{method:"POST",headers:{Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify(ev)});if(!r.ok){const e=new Error("http");e.status=r.status;throw e}if(note){const j=await r.json();S.gnote=S.gnote||{};S.gnote[j.id]=note;save()}return tk})).then(tk=>gcRun(tk,true)).then(()=>toast("Google 캘린더"+(cal&&cal!=="primary"&&gcCalName(cal)?"("+gcCalName(cal)+")":"")+"에도 등록했어요",2500)).catch(x=>gcErr(x,"등록하지"))}
 function gcDelAsk(id){const i=find(id),n=gSibs(i).length;if(gRO(i))return;if(i.g&&i.g.r&&n<2)return scopePop("반복 일정 삭제","gcdelok",id,"삭제","","Google 캘린더에서도 삭제돼요.");$("#ov").innerHTML='<div class="ov" data-a="bg"><div class="sh"><h2>Google 캘린더에서도 삭제<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.7;margin:4px 0 12px"><b>'+esc(gTitle(i))+'</b> 일정이 Google 캘린더에서도 삭제돼요.'+(n>1?'<br>며칠에 걸친 일정이라 '+n+'일 모두 삭제돼요.':'')+(i.g&&i.g.r?'<br>반복 일정은 이 날짜 하나만 삭제돼요.':'')+'</p><button class="pb" data-a="gcdelok" data-id="'+id+'" style="background:var(--red)">삭제</button><button class="sb" data-a="close" style="text-align:center;color:var(--mute)">취소</button></div></div>'}
 function gcDelOk(id,sc){const i=find(id);if(!i||!i.gid)return;if(sc==="fut"||sc==="all")return gcDelRec(i,sc);const eid=gEid(i),tkP=gcGetTok();close();toast("삭제하는 중…",0);
 tkP.then(tk=>gcSerial(()=>gcDeleteEvent(tk,eid,gC(i)))).then(()=>{S.items=S.items.filter(x=>!(x.gid&&gEid(x)===eid));save();render();toast("Google 캘린더에서도 삭제했어요",2500)}).catch(x=>gcErr(x,"삭제하지"))}
@@ -600,8 +613,9 @@ if(tt!=null)sb.forEach(x=>x.text=gPre(x)+tt);
 if(tm!==undefined){const ti=gTitle(i),p=tm?tm+" ":"";i.g=Object.assign({},i.g,{p,a:tm?0:1});i.text=p+ti;i.order=tm?-1+(+tm.slice(0,2)*60+ +tm.slice(3,5))/10000:-2}
 if(shift){mat(nd);i.date=nd;i.order=nx(nd);i.gid=eid+"@"+nd}
 save();render();if(exK)expand(exK);toast("Google 캘린더에 반영하는 중…",0);
-tkP.then(tk=>gcSerial(()=>gcPatchEvent(tk,eid,shift,tt,tm,ex,gC(i))).then(()=>{toast("Google 캘린더에도 반영했어요",2200);if(ex)gcRun(tk,true)})).catch(x=>{snap.forEach(s=>{const o=S.items.find(y=>y.id===s.id);if(o)Object.assign(o,s)});save();render();if(exK)expand(exK);gcErr(x,"반영하지")})}
+tkP.then(tk=>gcSerial(()=>gcPatchEvent(tk,eid,shift,gSum(tt),tm,ex,gC(i))).then(()=>{toast("Google 캘린더에도 반영했어요",2200);if(ex)gcRun(tk,true)})).catch(x=>{snap.forEach(s=>{const o=S.items.find(y=>y.id===s.id);if(o)Object.assign(o,s)});save();render();if(exK)expand(exK);gcErr(x,"반영하지")})}
 function gcEditOk(id,sc){const rq={t:rp.t,days:rp.days.slice()},i=find(id),t=$("#et").value.trim(),de=$("#ed"),nd=de&&de.value?de.value:i.date,te=$("#etm");if(!t)return;const tt=t!==gTitle(i)?t:null,tm=te&&te.value!==gPre(i).trim()?te.value:undefined;
+if(tt!==null){const key=(i.g&&i.g.m)||gEid(i),nn=gSplit(tt)[1];S.gnote=S.gnote||{};if(nn)S.gnote[key]=nn;else delete S.gnote[key];save()}// ; 뒷부분 메모는 Weekly에만
 if(edG){edG=false;close()}else expand(exK);
 // rq(∞ 버튼, 위 expand가 rp를 지우기 전에 복사): "g"=Google 반복 그대로, "n"=반복 없음, 그 밖=새 규칙. rr: undefined=그대로, null=반복 없음, 문자열=새 RRULE
 if(rq.t==="w"&&!rq.days.length)rq.days=[P(i.date).getDay()];
@@ -614,7 +628,7 @@ if(nd!==i.date||tt!==null||tm!==undefined||ex)gcChange(id,nd!==i.date?nd:null,tt
 const gMid=i=>(i.g&&i.g.m)||gEid(i).replace(/_[^_]*$/,"");// 반복 원본 ID: 가져올 때 저장(g.m), 옛 데이터는 회차 ID 앞부분
 // Google 반복 일정 전체 변경: 원본 일정의 제목·시간(·반복 규칙)을 바꾸고 다시 가져옴
 function gcAllChange(i,tt,tm,rec){const mid=gMid(i),tkP=gcGetTok();toast("Google 캘린더에 반영하는 중…",0);
-tkP.then(tk=>gcSerial(()=>gcPatchEvent(tk,mid,0,tt,tm,rec!==undefined?{recurrence:rec}:undefined,gC(i))).then(()=>tk)).then(tk=>gcRun(tk,true)).then(()=>toast("반복 일정 전체에 반영했어요",2500)).catch(x=>gcErr(x,"반영하지"))}
+tkP.then(tk=>gcSerial(()=>gcPatchEvent(tk,mid,0,gSum(tt),tm,rec!==undefined?{recurrence:rec}:undefined,gC(i))).then(()=>tk)).then(tk=>gcRun(tk,true)).then(()=>toast("반복 일정 전체에 반영했어요",2500)).catch(x=>gcErr(x,"반영하지"))}
 // Google 반복 공용: 응답 확인(gJ), UNTIL/COUNT 떼기(gStrip), 이 회차 바로 전까지로 끝내는 UNTIL 값(gUntil: 종일이면 전날, 시간 일정이면 시작 1초 전 UTC)
 const gJ=async r=>{if(!r.ok){const e=new Error("http");e.status=r.status;throw e}return r.json()},gStrip=s=>s.replace(/;(UNTIL|COUNT)=[^;]*/g,""),
 gUntil=(inst,allDay)=>{const y=+inst.slice(0,4),mo=+inst.slice(4,6),dd=+inst.slice(6,8);return allDay?K(addD(new Date(y,mo-1,dd),-1)).replace(/-/g,""):new Date(Date.UTC(y,mo-1,dd,+inst.slice(9,11),+inst.slice(11,13),+inst.slice(13,15))-1e3).toISOString().replace(/[-:]|\.\d+/g,"")},
@@ -624,7 +638,7 @@ gPatch=(tk,id,body,c)=>fetch(gB(c)+encodeURIComponent(id)+"?sendUpdates=none",{m
 function gcFutChange(i,tt,tm,rr,wds,nk){const mid=gMid(i),inst=gInst(i),tkP=gcGetTok();if(!/^\d{8}/.test(inst))return typeof rr==="function"?gcMoveRec(i,nk,"all"):gcAllChange(i,tt,tm,rr===undefined?undefined:rr?[rr]:[]);toast("Google 캘린더에 반영하는 중…",0);
 tkP.then(tk=>gcSerial(async()=>{const m=await gMaster(tk,mid,gC(i)),base=(m.recurrence||[]).find(x=>/^RRULE:/.test(x));if(!base){const e=new Error("http");e.status=400;throw e}
 const allDay=!!m.start.date;await gPatch(tk,mid,{recurrence:m.recurrence.map(x=>/^RRULE:/.test(x)?gStrip(x)+";UNTIL="+gUntil(inst,allDay):x)},gC(i));
-const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00",ev={summary:tt!=null?tt:m.summary};let k=nk||i.date;
+const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,f=d=>K(d)+"T"+p2(d.getHours())+":"+p2(d.getMinutes())+":00",ev={summary:tt!=null?gSum(tt):m.summary};let k=nk||i.date;
 if(rr&&wds)while(!wds.includes(P(k).getDay()))k=K(addD(P(k),1));// 새 매주 반복은 시작일을 고른 요일로(Google은 시작일을 무조건 첫 회차로 넣음)
 if(tm===""||(allDay&&tm===undefined)){const n=allDay?Math.max(1,Math.round((P(m.end.date)-P(m.start.date))/864e5)):1;ev.start={date:k};ev.end={date:K(addD(P(k),n))}}
 else{const ms=m.start.dateTime?new Date(m.start.dateTime):null,dur=ms&&m.end.dateTime?new Date(m.end.dateTime)-ms:36e5,s=P(k);if(tm)s.setHours(+tm.slice(0,2),+tm.slice(3,5));else s.setHours(ms.getHours(),ms.getMinutes());ev.start={dateTime:f(s),timeZone:tz};ev.end={dateTime:f(new Date(s.getTime()+dur)),timeZone:tz}}
@@ -668,10 +682,17 @@ row=(on,t,d)=>'<div style="padding:10px 12px;border-radius:12px;margin-bottom:6p
 $("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>앱으로 설치하기<button data-a="close" class="ib">✕</button></h2><p class="mute" style="line-height:1.6;margin:0 0 10px">설치하면 주소창 없이 앱처럼 열리고, 바탕화면·홈 화면 아이콘으로 바로 들어올 수 있어요. 무료이고 용량도 거의 차지하지 않아요.</p>'+
 row(ios,"아이폰·아이패드 (Safari)","아래 <b>공유 버튼(⬆)</b> → <b>홈 화면에 추가</b>")+row(and,"안드로이드 (Chrome)","오른쪽 위 <b>⋮</b> → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>")+
 row(!ios&&!and&&edge,"PC (Edge)","오른쪽 위 <b>⋯</b> → <b>앱</b> → <b>이 사이트를 앱으로 설치</b>")+row(!ios&&!and&&!edge,"PC (Chrome)","주소창 오른쪽 <b>설치 아이콘(⊕)</b> → <b>설치</b>")+'<button class="sb" data-a="close" style="text-align:center">닫기</button></div></div>'}
-/* 업데이트 소식: 여러 캘린더 가져오기 + PC 앱 설치. 모두에게 한 번만(띄우면 계정에 S.nw2 저장) */
+/* 업데이트 소식(3번째): 캘린더 고르기·; 메모·새 테마·먼슬리. 모두에게 한 번만(띄우면 계정에 S.nw3 저장) */
 let nwShown=false;
-function nwSheet(){nwShown=true;S.nw2=1;save();const c=S.gcal,app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches;$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2><p style="font-size:14px;line-height:1.75;margin:2px 0 10px"><b>여러 Google 캘린더 가져오기</b><br>업무·운동·생일처럼 따로 만든 캘린더도 가져올 수 있어요. 캘린더마다 색 점이나 배경색으로 구분해서 보여줘요.<br><span class="mute">환경설정 → Google 캘린더에서 고를 수 있어요.'+(c?' 이미 연결했다면 <b>권한 다시 허용하고 가져오기</b>를 한 번 눌러 주세요.':' 연결할 때 "Google에서 확인하지 않은 앱" 화면이 나오면 <b>고급 → Weekly(으)로 이동</b>을 눌러 주세요.')+'</span></p>'+(app?'':'<p style="font-size:14px;line-height:1.75;margin:0 0 12px"><b>PC에 앱으로 설치하기</b><br>· Edge: 오른쪽 위 ⋯ → 앱 → 이 사이트를 앱으로 설치<br>· Chrome: 주소창 오른쪽 설치 버튼(⊕)<br><span class="mute">바탕화면 아이콘으로 바로 열리고, 화면 오른쪽 아래에 작은 창으로 떠요.</span></p>')+'<button class="pb" data-a="nwgo">'+(c?"환경설정 열기":"Google 캘린더 연결하기")+'</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
+function nwSheet(){nwShown=true;S.nw3=1;save();const app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches,
+sec=(t,b)=>'<div style="margin:0 0 12px"><b style="font-size:15px">'+t+'</b><div style="font-size:13.5px;line-height:1.7;margin-top:3px">'+b+"</div></div>";
+$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2>'+
+sec("🗓 Google 캘린더에 넣을 때","· <b>어느 캘린더에 넣을지</b> 고를 수 있어요. 체크하면 목록이 뜨고, 고른 캘린더 색 동그라미로 표시돼요.<br>· <b>; 뒤는 나만 보는 메모</b>예요. <span style=\"background:var(--accbg);padding:0 5px;border-radius:5px\">운동; 달리기 30분</span>이라고 쓰면 Google 캘린더엔 <b>운동</b>만 올라가요.")+
+sec("🎨 새 테마","· <b>시즌</b>: 봄·여름·가을·겨울이 달마다 자동으로 바뀌어요. 계절을 골라 고정할 수도 있어요.<br>· <b>파리</b>·<b>네온</b> 테마도 생겼어요.<br><span class=\"mute\">환경설정 → 화면 → 테마</span>")+
+sec("📅 먼슬리 달력","· 옆으로 밀면 달이 바뀌고, 날짜를 누르면 그 주로 가요.<br>· 위클리를 월요일 시작으로 해도 달력은 일요일부터 보여요.")+
+(app?"":sec("📲 앱으로 설치","환경설정 → 앱 · 도움말 → <b>앱으로 설치하기</b>"))+
+'<button class="pb" data-a="nwgo">환경설정 열기</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
 // 로그인·튜토리얼·다른 창이 없고, 로그인했다면 계정 데이터까지 받은 뒤에 띄움
-const nwT=setInterval(()=>{if(nwShown||S.nw2)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
+const nwT=setInterval(()=>{if(nwShown||S.nw3)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
 render();
 </script></body></html>
