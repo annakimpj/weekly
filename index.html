@@ -452,11 +452,13 @@ document.addEventListener("pointermove",e=>{if(!dn)return;if(dr)return mvGhost(e
 // 마우스로 칸 안 목록 드래그 스크롤. 칸 밖으로 끌고 나가면 일정 옮기기로 전환
 if(scl){const r=scl.l.closest(".cell").getBoundingClientRect();if(itEl&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)){scl.l.classList.remove("scl");scl=null;return startDrag(e.clientX,e.clientY)}scl.l.scrollTop=scl.st-(e.clientY-sy);return}
 if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){clearTimeout(lt);if(pt==="mouse"&&dl&&dl.scrollHeight>dl.clientHeight&&Math.abs(e.clientY-sy)>Math.abs(e.clientX-sx)){scl={l:dl,st:dl.scrollTop};dl.classList.add("scl");lp=true;return}if(pt==="mouse"&&itEl)startDrag(e.clientX,e.clientY)}});
-["pointerup","pointercancel"].forEach(t=>document.addEventListener(t,e=>{clearTimeout(lt);if(!dn)return;dn=false;const wasScl=scl;if(scl){scl.l.classList.remove("scl");scl=null}if(dr){const d=dr;dr=null;d.gh.remove();document.querySelectorAll(".dt,.dg,.rdt,.rdb").forEach(n=>n.classList.remove("dt","dg","rdt","rdb"));if(t==="pointerup")drop(d.id,e.clientX,e.clientY)}else if(t==="pointerup"&&pt==="mouse"&&!itEl&&!wasScl){const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)>80&&Math.abs(dy)<60){lp=true;swipe(dx<0?1:-1)}}setTimeout(()=>lp=false,50)}));
+["pointerup","pointercancel"].forEach(t=>document.addEventListener(t,e=>{clearTimeout(lt);if(!dn)return;dn=false;const wasScl=scl;if(scl){scl.l.classList.remove("scl");scl=null}if(dr){const d=dr;dr=null;d.gh.remove();document.querySelectorAll(".dt,.dg,.rdt,.rdb").forEach(n=>n.classList.remove("dt","dg","rdt","rdb"));if(t==="pointerup")drop(d.id,e.clientX,e.clientY)}else if(t==="pointerup"&&pt==="mouse"&&!itEl&&!wasScl){const dx=e.clientX-sx,dy=e.clientY-sy;if(swOk(dx,dy,80,60)){lp=true;swipe(dx<0?1:-1)}}setTimeout(()=>lp=false,50)}));
 // 옆으로 밀기: 먼슬리(작은 달력)에서 밀면 달 이동, 나머지는 주 이동
+// 먼슬리는 칸이 작고 화면 왼쪽에 있어서(오른쪽으로 밀 거리가 짧음) 35px만 밀어도, 가로가 세로보다 길면 넘김
+const swOk=(dx,dy,d,v)=>swCal?Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy):Math.abs(dx)>d&&Math.abs(dy)<v;
 let swCal=false;function swipe(dir){if(swCal){const b=cm||addD(wk(view),3);cm=new Date(b.getFullYear(),b.getMonth()+dir,1)}else view=addD(view,dir*7);render()}
 g.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;swCal=!!e.target.closest(".cal")},{passive:true});
-g.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>70&&Math.abs(dy)<50&&!lp)swipe(dx<0?1:-1)},{passive:true});
+g.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(swOk(dx,dy,70,50)&&!lp)swipe(dx<0?1:-1)},{passive:true});
 document.addEventListener("keydown",e=>{if($("#ov").innerHTML)return;if(e.key==="ArrowLeft"){view=addD(view,-7);render()}if(e.key==="ArrowRight"){view=addD(view,7);render()}});
 setInterval(()=>{if(K(new Date())!==lastD){lastD=K(new Date());render()}},60000);let lastD=K(new Date());
 let selD=null,fiWk="",cm=null,lastWk="",edG=false,ti=0,tourOn=false,ck={id:null,t:0,tm:null};
