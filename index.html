@@ -416,7 +416,6 @@ if(x==="rpt"){document.querySelectorAll("#rpp .rpt .thb").forEach(b=>b.classList
 if(x==="rpok"){const on=$("#rpp .rpt .on");rp.t=on?on.dataset.v:"n";rp.days=rp.t==="w"?[...document.querySelectorAll("#rpd input:checked")].map(x=>+x.value):[];if(rp.t==="w"&&!rp.days.length)rp.days=[P(rpK).getDay()];$("#rpp").remove();const b=$(".rpb");if(b)b.outerHTML=rpBtn();return}
 if(x==="rpx"){if(e.target===a)$("#rpp").remove();return}
 if(x==="wst"){S.mon=a.dataset.v==="1"?1:0;cm=null;save();render();return setSheet()}
-if(x==="nwgo"){close();return setSheet()}
 if(x==="clk"){const t=$("#"+a.dataset.t),on=!t.classList.contains("on");t.classList.toggle("on",on);a.classList.toggle("on",on);if(!on){t.value="";return}t.focus();try{t.showPicker()}catch(e){}return}
 if(x==="prev"){view=addD(view,-7);return render()}if(x==="next"){view=addD(view,7);return render()}
 if(x==="today"){selD=null;cm=null;view=new Date();return render()}
@@ -684,17 +683,15 @@ row=(on,t,d)=>'<div style="padding:10px 12px;border-radius:12px;margin-bottom:6p
 $("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>앱으로 설치하기<button data-a="close" class="ib">✕</button></h2><p class="mute" style="line-height:1.6;margin:0 0 10px">설치하면 주소창 없이 앱처럼 열리고, 바탕화면·홈 화면 아이콘으로 바로 들어올 수 있어요. 무료이고 용량도 거의 차지하지 않아요.</p>'+
 row(ios,"아이폰·아이패드 (Safari)","아래 <b>공유 버튼(⬆)</b> → <b>홈 화면에 추가</b>")+row(and,"안드로이드 (Chrome)","오른쪽 위 <b>⋮</b> → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>")+
 row(!ios&&!and&&edge,"PC (Edge)","오른쪽 위 <b>⋯</b> → <b>앱</b> → <b>이 사이트를 앱으로 설치</b>")+row(!ios&&!and&&!edge,"PC (Chrome)","주소창 오른쪽 <b>설치 아이콘(⊕)</b> → <b>설치</b>")+'<button class="sb" data-a="close" style="text-align:center">닫기</button></div></div>'}
-/* 업데이트 소식(3번째): 캘린더 고르기·; 메모·새 테마·먼슬리. 모두에게 한 번만(띄우면 계정에 S.nw3 저장) */
+/* 업데이트 소식(4번째): 새 앱 WEAVE 출시. 모두에게 한 번만(띄우면 계정에 S.nw4 저장) */
 let nwShown=false;
-function nwSheet(){nwShown=true;S.nw3=1;save();const app=matchMedia("(display-mode:standalone),(display-mode:window-controls-overlay)").matches,
-sec=(t,b)=>'<div style="margin:0 0 12px"><b style="font-size:15px">'+t+'</b><div style="font-size:13.5px;line-height:1.7;margin-top:3px">'+b+"</div></div>";
-$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh"><h2>업데이트 소식<button data-a="close" class="ib">✕</button></h2>'+
-sec("🗓 Google 캘린더에 넣을 때","· <b>어느 캘린더에 넣을지</b> 고를 수 있어요. 체크하면 목록이 뜨고, 고른 캘린더 색 동그라미로 표시돼요.<br>· <b>; 뒤는 나만 보는 메모</b>예요. <span style=\"background:var(--accbg);padding:0 5px;border-radius:5px\">운동; 달리기 30분</span>이라고 쓰면 Google 캘린더엔 <b>운동</b>만 올라가요.")+
-sec("🎨 새 테마","· <b>시즌</b>: 봄·여름·가을·겨울이 달마다 자동으로 바뀌어요. 계절을 골라 고정할 수도 있어요.<br>· <b>파리</b>·<b>네온</b> 테마도 생겼어요.<br><span class=\"mute\">환경설정 → 화면 → 테마</span>")+
-sec("📅 먼슬리 달력","· 옆으로 밀면 달이 바뀌고, 날짜를 누르면 그 주로 가요.<br>· 위클리를 월요일 시작으로 해도 달력은 일요일부터 보여요.")+
-(app?"":sec("📲 앱으로 설치","환경설정 → 앱 · 도움말 → <b>앱으로 설치하기</b>"))+
-'<button class="pb" data-a="nwgo">환경설정 열기</button><button class="sb" data-a="close" style="text-align:center">확인</button></div></div>'}
+function nwSheet(){nwShown=true;S.nw4=1;save();
+$("#ov").innerHTML='<div class="ov pop" data-a="bg"><div class="sh" style="text-align:center"><h2 style="justify-content:flex-end"><button data-a="close" class="ib">✕</button></h2>'+
+'<img src="weave.png" alt="" style="width:88px;height:88px;border-radius:22px;box-shadow:0 8px 22px #0000001f;margin:-6px auto 12px;display:block">'+
+'<b style="font-size:19px;letter-spacing:.08em">WEAVE</b><div class="mute" style="font-size:13px;margin:2px 0 14px">새 앱이 나왔어요</div>'+
+'<div style="font-size:14px;line-height:1.75;margin:0 0 16px"><b>먼슬리 · 위클리 · 일기장</b>을 하나로 합친 앱이에요.<br>Weekly와 <b>같은 계정으로 로그인</b>하면<br>지금 쓰던 일정도 그대로 이어져요.</div>'+
+'<a class="pb" href="https://weave.annakim.workers.dev/" target="_blank" rel="noopener" style="display:block;text-decoration:none">WEAVE 바로가기</a><button class="sb" data-a="close" style="text-align:center">닫기</button></div></div>'}
 // 로그인·튜토리얼·다른 창이 없고, 로그인했다면 계정 데이터까지 받은 뒤에 띄움
-const nwT=setInterval(()=>{if(nwShown||S.nw3)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
+const nwT=setInterval(()=>{if(nwShown||S.nw4)return clearInterval(nwT);if(!fbAuth||!authReady||(fbUser&&!synced)||tourOn||$("#login")||$("#tour")||$("#ov").innerHTML)return;nwSheet()},1500);
 render();
 </script></body></html>
